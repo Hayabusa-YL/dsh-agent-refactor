@@ -14,7 +14,7 @@
 
 | 命令 | 作用 | 输出 |
 | --- | --- | --- |
-| `scan` | 扫描死代码 / 未用依赖 / 循环依赖 | 终端报告 + HTML，每条结论带证据链（扫描文件数、引用链、可达性） |
+| `scan` | 扫描死代码 / 未用依赖 / 循环依赖 | 终端报告 + HTML，每条结论带证据链（扫描文件数、引用链、可达性）与置信度（high / medium / low） |
 | `fix` | 安全清理：备份 → 删除/清理 → 跑测试 → 通过保留 | 失败自动回滚，零残留 |
 | `split` | 把巨型组件拆成子组件 + hooks：分析 → 规划 → 生成 → 门禁 → 落地 | 拆分后的文件树 + 门禁日志 |
 | `analyze` | 对任意组件只出拆分计划，不落地 | 语义地图 + 拆分计划 |
@@ -39,6 +39,8 @@
 - 分析出 47 个状态、20 个 UI 区块、12 个副作用、3 处强耦合（changeEventInfo 共享对象、transformColumns 链、mergedData 依赖链）
 - 规划 3 组件 + 5 hooks + 7 步迁移，结构校验通过
 - 局限：该文件依赖 30+ 内部模块，只能验证规划质量，未能构建验证（见边界）
+
+**扫描精度**（2026-11 修复）：入口可达性 + 置信度分级后，real-repo 死代码 108 → 14，旧报告 100 条误报抽检 0 条仍是 high；mini-leads 旧报告 4 条误报全部降级；giant-app 0 条 high。fix 只删 high 置信死文件。
 
 **成本**：单组件完整拆分（分析 + 规划 + 生成，共 3 次 LLM 调用）约 2–3 万 token，按 DeepSeek 价格约 **3–5 分钱**；失败回喂修复每轮再加约 3 千 token。样本与记录见 `memory/audit/split-engine-2026-11-15.md`。
 
@@ -87,5 +89,5 @@ export AGENT_REFACTOR_LLM_MODEL=deepseek-chat
 - [x] 真实组件对照（antd InternalTable 规划验证）
 - [ ] 生成代码静态安全审查（eval/外网请求拦截）
 - [ ] 批量拆分：扫全项目巨组件，逐个拆
-- [ ] 真实仓库端到端构建验证
-- [ ] GitHub Action：PR 自动体检评论
+- [x] 真实仓库端到端构建验证（ant-design-pro advanced-form，构建 + 类型检查通过）
+- [x] GitHub Action：PR / push 自动体检评论（.github/workflows/self-scan.yml）

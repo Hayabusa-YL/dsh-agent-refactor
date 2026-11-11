@@ -1,0 +1,465 @@
+{
+  "width": 1280,
+  "height": 720,
+  "fps": 20,
+  "font_size": 22,
+  "line_height": 32,
+  "duration": 48.9,
+  "out_dir": "C:\\Users\\25670\\Desktop\\dsh-clean\\projects\\agent-refactor\\docs\\demo\\frames",
+  "terminal_in": 2.15,
+  "terminal_dim": 19.110000000000007,
+  "terminal_dim_alpha": 0.3,
+  "title_in": 0.15,
+  "title_out": 2.25,
+  "card_in": 19.110000000000007,
+  "card_out": 27.310000000000006,
+  "card_image": "C:\\Users\\25670\\Desktop\\dsh-clean\\projects\\agent-refactor\\docs\\demo\\report\\report-shot.png",
+  "card_width": 820,
+  "card_crop": [
+    40,
+    20,
+    1480,
+    920
+  ],
+  "ending_in": 39.81,
+  "events": [
+    {
+      "t": 2.6,
+      "type": "typing_prompt",
+      "prompt": "$ ",
+      "prompt_color": [
+        86,
+        212,
+        221
+      ],
+      "text": "node bin/cli.js scan .",
+      "color": [
+        201,
+        209,
+        217
+      ],
+      "dur": 1.5
+    },
+    {
+      "t": 4.3,
+      "type": "progress",
+      "label": "Scanning",
+      "total": 5,
+      "files": [
+        "a.js",
+        "b.js",
+        "index.js",
+        "orphan.js",
+        "utils.js"
+      ],
+      "dur": 4.2
+    },
+    {
+      "t": 8.9,
+      "type": "line",
+      "text": "  agent-refactor 代码体检报告",
+      "color": [
+        88,
+        166,
+        255
+      ],
+      "bold": true
+    },
+    {
+      "t": 9.64,
+      "type": "line",
+      "text": "  扫描 5 个源文件 · 2026-11-11",
+      "color": [
+        139,
+        148,
+        158
+      ],
+      "bold": false
+    },
+    {
+      "t": 10.28,
+      "type": "line",
+      "text": "",
+      "color": [
+        139,
+        148,
+        158
+      ]
+    },
+    {
+      "t": 10.38,
+      "type": "line",
+      "text": "  死代码（2）",
+      "color": [
+        201,
+        209,
+        217
+      ],
+      "bold": true
+    },
+    {
+      "t": 10.97,
+      "type": "line",
+      "text": "    ⚠ src\\orphan.js",
+      "color": [
+        255,
+        216,
+        102
+      ],
+      "bold": false
+    },
+    {
+      "t": 11.39,
+      "type": "line",
+      "text": "       └ 扫描 5 个源文件",
+      "color": [
+        139,
+        148,
+        158
+      ],
+      "bold": false
+    },
+    {
+      "t": 12.03,
+      "type": "line",
+      "text": "       └ 0 处 import/require 引用它",
+      "color": [
+        139,
+        148,
+        158
+      ],
+      "bold": false
+    },
+    {
+      "t": 12.27,
+      "type": "line",
+      "text": "       └ 从 1 个入口出发不可达",
+      "color": [
+        139,
+        148,
+        158
+      ],
+      "bold": false
+    },
+    {
+      "t": 12.51,
+      "type": "line",
+      "text": "       ↳ 引用来源：没有任何文件引用它",
+      "color": [
+        139,
+        148,
+        158
+      ],
+      "bold": false
+    },
+    {
+      "t": 12.75,
+      "type": "line",
+      "text": "    ⚠ src\\utils.js",
+      "color": [
+        255,
+        216,
+        102
+      ],
+      "bold": false
+    },
+    {
+      "t": 13.17,
+      "type": "line",
+      "text": "       └ 扫描 5 个源文件",
+      "color": [
+        139,
+        148,
+        158
+      ],
+      "bold": false
+    },
+    {
+      "t": 13.81,
+      "type": "line",
+      "text": "       └ 0 处 import/require 引用它",
+      "color": [
+        139,
+        148,
+        158
+      ],
+      "bold": false
+    },
+    {
+      "t": 14.05,
+      "type": "line",
+      "text": "       └ 从 1 个入口出发不可达",
+      "color": [
+        139,
+        148,
+        158
+      ],
+      "bold": false
+    },
+    {
+      "t": 14.29,
+      "type": "line",
+      "text": "       ↳ 引用来源：没有任何文件引用它",
+      "color": [
+        139,
+        148,
+        158
+      ],
+      "bold": false
+    },
+    {
+      "t": 14.53,
+      "type": "line",
+      "text": "",
+      "color": [
+        139,
+        148,
+        158
+      ]
+    },
+    {
+      "t": 14.63,
+      "type": "line",
+      "text": "  未使用依赖（1）",
+      "color": [
+        201,
+        209,
+        217
+      ],
+      "bold": true
+    },
+    {
+      "t": 15.22,
+      "type": "line",
+      "text": "    ⚠ unused-pkg  扫描 5 个源文件，无 import/require 命中",
+      "color": [
+        139,
+        148,
+        158
+      ],
+      "bold": false
+    },
+    {
+      "t": 15.86,
+      "type": "line",
+      "text": "",
+      "color": [
+        139,
+        148,
+        158
+      ]
+    },
+    {
+      "t": 15.96,
+      "type": "line",
+      "text": "  循环依赖（1）",
+      "color": [
+        201,
+        209,
+        217
+      ],
+      "bold": true
+    },
+    {
+      "t": 16.55,
+      "type": "line",
+      "text": "    ⚠ src\\b.js → src\\a.js → src\\b.js",
+      "color": [
+        255,
+        216,
+        102
+      ],
+      "bold": false
+    },
+    {
+      "t": 16.97,
+      "type": "line",
+      "text": "",
+      "color": [
+        139,
+        148,
+        158
+      ]
+    },
+    {
+      "t": 17.07,
+      "type": "line",
+      "text": "  HTML 报告：agent-refactor-report.html",
+      "color": [
+        139,
+        148,
+        158
+      ],
+      "bold": false
+    },
+    {
+      "t": 27.81,
+      "type": "typing_prompt",
+      "prompt": "$ ",
+      "prompt_color": [
+        86,
+        212,
+        221
+      ],
+      "text": "node bin/cli.js fix . --yes",
+      "color": [
+        201,
+        209,
+        217
+      ],
+      "dur": 1.6
+    },
+    {
+      "t": 29.71,
+      "type": "line",
+      "text": "  修复计划：删除 2 个死文件，移除 1 个未用依赖",
+      "color": [
+        201,
+        209,
+        217
+      ],
+      "bold": true
+    },
+    {
+      "t": 30.4,
+      "type": "line",
+      "text": "    - src\\orphan.js",
+      "color": [
+        255,
+        216,
+        102
+      ],
+      "bold": false
+    },
+    {
+      "t": 30.86,
+      "type": "line",
+      "text": "    - src\\utils.js",
+      "color": [
+        255,
+        216,
+        102
+      ],
+      "bold": false
+    },
+    {
+      "t": 31.32,
+      "type": "line",
+      "text": "    - unused-pkg（package.json）",
+      "color": [
+        255,
+        216,
+        102
+      ],
+      "bold": false
+    },
+    {
+      "t": 31.78,
+      "type": "line",
+      "text": "    - 删除 src\\orphan.js",
+      "color": [
+        255,
+        107,
+        107
+      ],
+      "bold": false
+    },
+    {
+      "t": 32.3,
+      "type": "line",
+      "text": "    - 删除 src\\utils.js",
+      "color": [
+        255,
+        107,
+        107
+      ],
+      "bold": false
+    },
+    {
+      "t": 32.82,
+      "type": "line",
+      "text": "    - 移除依赖 unused-pkg（package.json）",
+      "color": [
+        255,
+        107,
+        107
+      ],
+      "bold": false
+    },
+    {
+      "t": 33.34,
+      "type": "line",
+      "text": "  ✓ 修复完成，测试通过",
+      "color": [
+        63,
+        185,
+        80
+      ],
+      "bold": false
+    },
+    {
+      "t": 33.88,
+      "type": "line",
+      "text": "    ✓ PASSED a.js 导出正常，循环依赖安全加载",
+      "color": [
+        63,
+        185,
+        80
+      ],
+      "bold": false
+    },
+    {
+      "t": 34.42,
+      "type": "line",
+      "text": "    ✓ PASSED b.js 导出正常",
+      "color": [
+        63,
+        185,
+        80
+      ],
+      "bold": false
+    },
+    {
+      "t": 34.96,
+      "type": "line",
+      "text": "    ✓ PASSED 入口模块跳过（lodash 未安装，不影响死代码验证）",
+      "color": [
+        63,
+        185,
+        80
+      ],
+      "bold": false
+    },
+    {
+      "t": 35.5,
+      "type": "line",
+      "text": "  测试门禁通过（114ms）",
+      "color": [
+        139,
+        148,
+        158
+      ],
+      "bold": false
+    },
+    {
+      "t": 36.84,
+      "type": "line",
+      "text": "  失败自动回滚：测试失败，已自动回滚",
+      "color": [
+        139,
+        148,
+        158
+      ]
+    },
+    {
+      "t": 37.19,
+      "type": "line",
+      "text": "  备份在系统临时目录，成功清理、失败原样恢复",
+      "color": [
+        139,
+        148,
+        158
+      ]
+    }
+  ]
+}

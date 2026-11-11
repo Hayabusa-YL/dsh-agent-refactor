@@ -70,3 +70,24 @@ test('fix dry-run changes nothing', async () => {
     await rm(dir, { recursive: true, force: true });
   }
 });
+
+test('fix only deletes high-confidence dead files', async () => {
+  const dir = await makeProject();
+  try {
+    await mkdir(join(dir, 'tools'), { recursive: true });
+    await writeFile(join(dir, 'tools', 'helper.js'), 'export const helper = 1;\n', 'utf8');
+    await writeFile(join(dir, 'README.md'), 'Run `node tools/helper.js` to regenerate.\n', 'utf8');
+    const scan = await scanProject(dir);
+    const helper = scan.deadFiles.find((d) => d.file.replace(/\\/g, '/') === 'tools/helper.js');
+    assert.equal(helper?.confidence, 'medium', 'README reference downgrades to medium');
+    const res = await applyFix(dir, scan, { yes: true });
+    assert.equal(res.ok, true, JSON.stringify(res));
+    const helperExists = await readFile(join(dir, 'tools', 'helper.js')).then(() => true).catch(() => false);
+    const orphanExists = await readFile(join(dir, 'src', 'orphan.js')).then(() => true).catch(() => false);
+    assert.equal(helperExists, true, 'medium-confidence file must not be deleted');
+    assert.equal(orphanExists, false, 'high-confidence orphan is deleted');
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+

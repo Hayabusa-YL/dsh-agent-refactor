@@ -9,20 +9,23 @@ inputs:
     description: Also generate an HTML report artifact
     required: false
     default: 'false'
+outputs:
+  exit-code:
+    description: Exit code of the scan
+    value: ${{ steps.scan.outputs.exit-code }}
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v4
-      with:
-        path: target-repo
+    - name: Install dependencies
+      shell: bash
+      run: npm --prefix "$GITHUB_ACTION_PATH" install --omit=dev --no-audit --no-fund
 
     - name: Run scan
       id: scan
       shell: bash
       run: |
-        cd "$GITHUB_WORKSPACE/target-repo"
         set +e
-        npx --yes agent-refactor scan "${{ inputs.path }}" --json --html agent-refactor-report.html > report.json 2> scan.err
+        node "$GITHUB_ACTION_PATH/bin/cli.js" scan "${{ inputs.path }}" --json --html agent-refactor-report.html > report.json 2> scan.err
         CODE=$?
         set -e
         echo "exit-code=$CODE" >> "$GITHUB_OUTPUT"
@@ -39,7 +42,7 @@ runs:
           const root = process.env.GITHUB_WORKSPACE;
           let summary = '';
           try {
-            const raw = fs.readFileSync(path.join(root, 'target-repo', 'report.json'), 'utf8');
+            const raw = fs.readFileSync(path.join(root, 'report.json'), 'utf8');
             const r = JSON.parse(raw);
             const lines = [];
             lines.push('## agent-refactor 代码体检');
@@ -49,7 +52,7 @@ runs:
             lines.push(`### 死代码（${r.deadFiles.length}）`);
             if (r.deadFiles.length === 0) lines.push('✓ 未发现孤立文件');
             for (const d of r.deadFiles.slice(0, 10)) {
-              lines.push(`- \`${d.file}\` — ${d.evidence.join('；')}`);
+              lines.push(`- \`${d.file}\` — ${Array.isArray(d.evidence) ? d.evidence.join('；') : d.evidence}`);
             }
             lines.push('');
             lines.push(`### 未使用依赖（${r.unusedDeps.length}）`);
@@ -81,4 +84,4 @@ runs:
       uses: actions/upload-artifact@v4
       with:
         name: agent-refactor-report
-        path: target-repo/agent-refactor-report.html
+        path: agent-refactor-report.html

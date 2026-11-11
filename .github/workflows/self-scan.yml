@@ -1,0 +1,19 @@
+name: self-scan
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  agent-refactor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run agent-refactor action
+        uses: ./
+        with:
+          path: '.'
+      - name: Upload HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent-refactor-report
+          path: agent-refactor-report.html

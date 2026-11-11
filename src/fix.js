@@ -12,8 +12,10 @@ export async function applyFix(root, scanResult, options = {}) {
   const { dryRun = false, skipTests = false, yes = false } = options;
   const { deadFiles, unusedDeps } = scanResult;
 
+  // 只删除高置信死代码；medium/low 只提示，不进修复计划
+  const safeDead = deadFiles.filter((d) => (d.confidence ?? 'high') === 'high');
   const plan = {
-    deleteFiles: deadFiles.map((d) => d.file),
+    deleteFiles: safeDead.map((d) => d.file),
     removeDeps: unusedDeps.map((d) => d.name),
   };
 

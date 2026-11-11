@@ -2,20 +2,34 @@ import { writeFile } from 'node:fs/promises';
 
 export function renderTerminal(result, chalk) {
   const { meta, deadFiles, unusedDeps, toolchainDeps, cycles } = result;
+  const high = deadFiles.filter((d) => d.confidence === 'high');
+  const unsure = deadFiles.filter((d) => d.confidence !== 'high');
   console.log('');
   console.log(chalk.bold.cyan('  agent-refactor 代码体检报告'));
   console.log(chalk.dim(`  扫描 ${meta.scannedFiles} 个源文件 · ${meta.scannedAt.slice(0, 10)}`));
   console.log('');
 
-  console.log(chalk.bold(`  死代码（${deadFiles.length}）`));
-  if (deadFiles.length === 0) console.log(chalk.green('    ✓ 未发现孤立文件'));
-  for (const d of deadFiles.slice(0, 20)) {
-    console.log(chalk.yellow(`    ⚠ ${d.file}`));
+  console.log(chalk.bold(`  死代码 · 高置信（${high.length}）`));
+  if (high.length === 0) console.log(chalk.green('    ✓ 未发现孤立文件'));
+  for (const d of high.slice(0, 20)) {
+    console.log(chalk.yellow(`    ⚠ [high] ${d.file}`));
     for (const e of d.evidence) console.log(chalk.dim(`       └ ${e}`));
     if (d.chain?.length) console.log(chalk.dim(`       ↳ 引用来源：${d.chain.join('、')}`));
   }
-  if (deadFiles.length > 20) console.log(chalk.dim(`    …… 共 ${deadFiles.length} 项，见 HTML 报告`));
+  if (high.length > 20) console.log(chalk.dim(`    …… 共 ${high.length} 项，见 HTML 报告`));
   console.log('');
+
+  if (unsure.length) {
+    console.log(chalk.bold(`  疑似死代码 · 不判死，需人工确认（${unsure.length}）`));
+    for (const d of unsure.slice(0, 20)) {
+      const label = d.confidence === 'medium' ? 'medium' : 'low';
+      console.log(chalk.dim(`    ? [${label}] ${d.file}`));
+      const note = d.evidence.find((e) => e.startsWith('仅有') || e.startsWith('仅被'));
+      if (note) console.log(chalk.dim(`       └ ${note}`));
+    }
+    if (unsure.length > 20) console.log(chalk.dim(`    …… 共 ${unsure.length} 项，见 HTML 报告`));
+    console.log('');
+  }
 
   console.log(chalk.bold(`  未使用依赖（${unusedDeps.length}）`));
   if (unusedDeps.length === 0) console.log(chalk.green('    ✓ 未发现未用依赖'));
@@ -43,12 +57,17 @@ export async function writeHtmlReport(result, outPath) {
   const { meta, deadFiles, unusedDeps, toolchainDeps, cycles } = result;
   const projectName = meta.root ? String(meta.root).split(/[\\/]/).filter(Boolean).pop() : '';
 
-  const deadRows = deadFiles.map((d) => `
+  const highDead = deadFiles.filter((d) => d.confidence === 'high');
+  const unsureDead = deadFiles.filter((d) => d.confidence !== 'high');
+
+  const renderDeadRows = (list) => list.map((d) => `
     <div class="item">
-      <div class="file">${escapeHtml(d.file)}</div>
+      <div class="file">${escapeHtml(d.file)}<span class="badge">${escapeHtml(d.confidence || 'high')}</span></div>
       <div class="evidence">${d.evidence.map((e) => `<span class="chain">${escapeHtml(e)}</span>`).join('')}
       ${d.chain?.length ? `<span class="chain chain-src">↳ 引用来源：${escapeHtml(d.chain.join('、'))}</span>` : ''}</div>
     </div>`).join('');
+  const deadRows = renderDeadRows(highDead);
+  const unsureRows = renderDeadRows(unsureDead);
 
   const depRows = unusedDeps.map((d) => `
     <div class="item"><div class="file">${escapeHtml(d.name)}</div><div class="evidence">${escapeHtml(d.evidence)}</div></div>`).join('');
@@ -80,8 +99,11 @@ export async function writeHtmlReport(result, outPath) {
   <h1>agent-refactor 代码体检报告</h1>
   <div class="meta">扫描 ${meta.scannedFiles} 个源文件 · ${escapeHtml(meta.scannedAt.slice(0, 10))}${projectName ? ` · 项目 ${escapeHtml(projectName)}` : ''}</div>
 
-  <h2>死代码 <span class="badge">${deadFiles.length}</span></h2>
+  <h2>死代码 · 高置信 <span class="badge">${highDead.length}</span></h2>
   ${deadRows || '<div class="item ok">✓ 未发现孤立文件</div>'}
+
+  <h2>疑似死代码 · 不判死，需人工确认 <span class="badge">${unsureDead.length}</span></h2>
+  ${unsureRows || '<div class="item ok">✓ 无低置信提示</div>'}
 
   <h2>未使用依赖 <span class="badge">${unusedDeps.length}</span></h2>
   ${depRows || '<div class="item ok">✓ 未发现未用依赖</div>'}

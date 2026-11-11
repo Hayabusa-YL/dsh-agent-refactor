@@ -32,7 +32,11 @@ export function run(argv) {
         }
         const htmlPath = await writeHtmlReport(result, resolve(process.cwd(), opts.html));
         const displayPath = relative(process.cwd(), htmlPath) || htmlPath;
-        console.log(chalk.dim(`  HTML 报告：${displayPath}`));
+        if (opts.json) {
+          console.error(chalk.dim(`  HTML 报告：${displayPath}`));
+        } else {
+          console.log(chalk.dim(`  HTML 报告：${displayPath}`));
+        }
       } catch (e) {
         console.error(chalk.red(`  扫描失败：${e.message}`));
         process.exitCode = 1;
@@ -69,9 +73,12 @@ export function run(argv) {
       const root = target ? resolve(target) : process.cwd();
       try {
         const result = await scanProject(root);
-        const planLine = `删除 ${result.deadFiles.length} 个死文件，移除 ${result.unusedDeps.length} 个未用依赖`;
+        const safeDead = result.deadFiles.filter((d) => d.confidence === 'high');
+        const planLine = `删除 ${safeDead.length} 个高置信死文件，移除 ${result.unusedDeps.length} 个未用依赖`;
         console.log(chalk.bold(`  修复计划：${planLine}`));
-        for (const d of result.deadFiles) console.log(chalk.yellow(`    - ${d.file}`));
+        for (const d of safeDead) console.log(chalk.yellow(`    - ${d.file}`));
+        const unsure = result.deadFiles.length - safeDead.length;
+        if (unsure) console.log(chalk.dim(`    （另有 ${unsure} 条仅有字符串/约定证据，需人工确认，未列入删除计划）`));
         for (const d of result.unusedDeps) console.log(chalk.yellow(`    - ${d.name}（package.json）`));
 
         const fixResult = await applyFix(root, result, {
