@@ -5,3 +5,4 @@ fixtures/real-repo/
 fixtures/giant-app/dist/
 *.log
 .env
+tmp/

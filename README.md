@@ -1,12 +1,16 @@
 # agent-refactor
 
-> 以「代码体检」为入口的 AI 工程师工具包：扫出死代码、未用依赖、循环依赖，安全地修掉它，再把 800 行巨型组件拆成可维护的结构——**每一步都有证据链、测试门禁和自动回滚**。
+> **别再手动排雷了。** 一键给代码库做微创手术：自动清掉没人用的死代码和依赖，删之前先备份、删完自动跑测试，崩了自动还原——每一步都有证据链，不让你背锅。
 
 不是"告诉你哪里臭"，而是"告诉你这行代码为什么没人用、这块 UI 为什么拆不动，然后安全地清掉或拆开它"。
 
-## 演示（15 秒）
+## 演示
 
-![scan 扫出问题、fix 安全修复的终端演示](docs/case-study/demo/demo.gif)
+![scan 扫出问题、fix 安全修复的终端演示](docs/demo/demo.gif)
+
+终端里扫完，浏览器里直接生成 HTML 体检报告——每条死代码都带引用链和置信度，截图如下（[下载 mp4](docs/demo/demo.mp4)）：
+
+![HTML 体检报告截图](docs/demo/report/report-shot.png)
 
 ## 它做什么
 
@@ -18,6 +22,14 @@
 | `fix` | 安全清理：备份 → 删除/清理 → 跑测试 → 通过保留 | 失败自动回滚，零残留 |
 | `split` | 把巨型组件拆成子组件 + hooks：分析 → 规划 → 生成 → 门禁 → 落地 | 拆分后的文件树 + 门禁日志 |
 | `analyze` | 对任意组件只出拆分计划，不落地 | 语义地图 + 拆分计划 |
+
+## 这个工具能帮你解决什么麻烦？
+
+**接手了别人的代码，不敢删任何文件？** 最怕一删就崩、锅是自己的。`scan` 跑一遍，列出没人引用的死代码和没用的依赖，每条结论带证据链（扫了多少文件、谁引用它、从入口能不能走到）；拿不准先 `--dry-run` 看计划，确认了再修——`fix` 会先备份、删完跑测试，测试挂了自动还原，不让你背锅。
+
+**重构完一地鸡毛，遗留一堆垃圾？** 接进 GitHub Action，每次推 PR 自动扫一遍，把这次新冒出来的死代码直接评论在 PR 里，合并前自己看清。
+
+**技术主管没空逐个审查？** 定期跑一次，看哪些模块已经变成"无人问津的孤岛"——没人引用、没人 import、只在 git 历史里活着。
 
 ## 实测数据（真实，可复核）
 
@@ -60,9 +72,27 @@
 
 ## 快速开始
 
+最快的方式是直接跑自带的演示项目，十秒看到结果：
+
 ```bash
-npm install
+# 一次性准备
+git clone https://github.com/Hayabusa-YL/dsh-agent-refactor.git
+cd dsh-agent-refactor && npm install
+
+# 对着演示项目跑一遍（扫描 5 个文件，附死代码 / 未用依赖 / 循环依赖）
 node bin/cli.js scan fixtures/demo-project
+```
+
+正式使用（在你要体检的项目里）：
+
+```bash
+node bin/cli.js scan .
+node bin/cli.js fix . --dry-run   # 先看计划，确认后再加 --yes
+node bin/cli.js analyze fixtures/real-components/antd-InternalTable.tsx   # 需配 LLM
+node bin/cli.js split fixtures/giant-app/src/App.tsx --yes               # 需配 LLM
+```
+
+> npm 包正在准备发布；发布后 `npx agent-refactor scan ./你的项目` 一行搞定。在那之前用上面的 git clone 方式，功能完全一样。
 node bin/cli.js fix fixtures/demo-project --dry-run
 node bin/cli.js analyze fixtures/real-components/antd-InternalTable.tsx   # 需配 LLM
 node bin/cli.js split fixtures/giant-app/src/App.tsx --yes               # 需配 LLM
