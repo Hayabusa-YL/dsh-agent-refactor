@@ -92,11 +92,7 @@ node bin/cli.js analyze fixtures/real-components/antd-InternalTable.tsx   # 需�
 node bin/cli.js split fixtures/giant-app/src/App.tsx --yes               # 需配 LLM
 ```
 
-> npm 包正在准备发布；发布后 `npx agent-refactor scan ./你的项目` 一行搞定。在那之前用上面的 git clone 方式，功能完全一样。
-node bin/cli.js fix fixtures/demo-project --dry-run
-node bin/cli.js analyze fixtures/real-components/antd-InternalTable.tsx   # 需配 LLM
-node bin/cli.js split fixtures/giant-app/src/App.tsx --yes               # 需配 LLM
-```
+> 已发布到 npm：`npx agent-refactor scan ./你的项目` 一行搞定（无需 clone 和 install）。
 
 LLM 配置（环境变量）：
 

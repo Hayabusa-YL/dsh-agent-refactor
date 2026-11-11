@@ -15,6 +15,13 @@
     "commander": "^12.1.0",
     "ora": "^8.0.0"
   },
+  "files": [
+    "bin",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": "github:Hayabusa-YL/dsh-agent-refactor",
   "engines": {
     "node": ">=18"
   }
