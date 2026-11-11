@@ -1,0 +1,16 @@
+flowchart TD
+  App["App.jsx（100B，入口）"] --> Dash["Dashboard.jsx（119 行容器）"]
+  Dash --> Toolbar["DashboardToolbar 标题栏+操作"]
+  Dash --> Filter["FilterPanel 筛选面板"]
+  Dash --> Table["UserTable 表格"]
+  Dash --> Pager["Pagination 分页"]
+  Dash --> Modal["UserFormModal 新增/编辑弹窗"]
+  Dash --> Confirm["ConfirmDialog 删除确认"]
+  Dash --> H1["useUserDashboard 核心状态（6.3KB）"]
+  Dash --> H2["useUserFilters 筛选状态（1.6KB）"]
+  Dash --> H3["useToast 轻提示（0.6KB）"]
+  H1 --> Table
+  H2 --> Filter
+  Filter --> Table
+  Table --> Pager
+  Modal --> H1

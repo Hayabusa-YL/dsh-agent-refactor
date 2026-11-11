@@ -1,0 +1,84 @@
+name: agent-refactor
+description: Scan pull requests for dead code, unused deps and import cycles. Posts an evidence-backed report as a PR comment.
+inputs:
+  path:
+    description: Project path to scan
+    required: false
+    default: '.'
+  report-html:
+    description: Also generate an HTML report artifact
+    required: false
+    default: 'false'
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v4
+      with:
+        path: target-repo
+
+    - name: Run scan
+      id: scan
+      shell: bash
+      run: |
+        cd "$GITHUB_WORKSPACE/target-repo"
+        set +e
+        npx --yes agent-refactor scan "${{ inputs.path }}" --json --html agent-refactor-report.html > report.json 2> scan.err
+        CODE=$?
+        set -e
+        echo "exit-code=$CODE" >> "$GITHUB_OUTPUT"
+        echo "--- scan.err (tail) ---"
+        tail -20 scan.err || true
+
+    - name: Post PR comment
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const path = require('path');
+          const root = process.env.GITHUB_WORKSPACE;
+          let summary = '';
+          try {
+            const raw = fs.readFileSync(path.join(root, 'target-repo', 'report.json'), 'utf8');
+            const r = JSON.parse(raw);
+            const lines = [];
+            lines.push('## agent-refactor 代码体检');
+            lines.push('');
+            lines.push(`扫描 ${r.meta.scannedFiles} 个源文件。`);
+            lines.push('');
+            lines.push(`### 死代码（${r.deadFiles.length}）`);
+            if (r.deadFiles.length === 0) lines.push('✓ 未发现孤立文件');
+            for (const d of r.deadFiles.slice(0, 10)) {
+              lines.push(`- \`${d.file}\` — ${d.evidence.join('；')}`);
+            }
+            lines.push('');
+            lines.push(`### 未使用依赖（${r.unusedDeps.length}）`);
+            if (r.unusedDeps.length === 0) lines.push('✓ 未发现未用依赖');
+            for (const d of r.unusedDeps.slice(0, 10)) {
+              lines.push(`- \`${d.name}\` — ${d.evidence}`);
+            }
+            lines.push('');
+            lines.push(`### 循环依赖（${r.cycles.length}）`);
+            if (r.cycles.length === 0) lines.push('✓ 未发现循环');
+            for (const ring of r.cycles.slice(0, 10)) {
+              lines.push(`- ${ring.map(x => '`' + x + '`').join(' → ')} → \`${ring[0]}\``);
+            }
+            lines.push('');
+            lines.push('> 本评论由 agent-refactor 自动生成，结论均附证据链。');
+            summary = lines.join('\n');
+          } catch (e) {
+            summary = '## agent-refactor 代码体检\n\n扫描失败：' + e.message;
+          }
+          await github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: summary,
+          });
+
+    - name: Upload HTML report
+      if: inputs.report-html == 'true'
+      uses: actions/upload-artifact@v4
+      with:
+        name: agent-refactor-report
+        path: target-repo/agent-refactor-report.html

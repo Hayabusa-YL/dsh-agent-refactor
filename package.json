@@ -1,0 +1,21 @@
+{
+  "name": "agent-refactor",
+  "version": "0.1.0",
+  "description": "AST-powered code health CLI: dead code, unused deps, cycles — with evidence chains",
+  "type": "module",
+  "bin": {
+    "agent-refactor": "bin/cli.js"
+  },
+  "main": "src/cli.js",
+  "scripts": {
+    "test": "node --test test/scan.test.js test/fix.test.js test/splitter.test.js test/split-flow.test.js"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^12.1.0",
+    "ora": "^8.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

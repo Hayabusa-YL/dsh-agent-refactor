@@ -1,0 +1,7 @@
+node_modules/
+dist/
+agent-refactor-report.html
+fixtures/real-repo/
+fixtures/giant-app/dist/
+*.log
+.env

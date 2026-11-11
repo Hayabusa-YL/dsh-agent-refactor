@@ -1,0 +1,7 @@
+{
+  "name": "demo-rollback",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "scripts": { "test": "node fail.js" },
+  "dependencies": { "lodash": "^4.17.0", "unused-pkg": "^1.0.0" }
+}
