@@ -217,7 +217,10 @@ async function walk(dir, state) {
   for (const e of entries) {
     const p = join(dir, e.name);
     if (e.isDirectory()) {
-      if (IGNORE_DIRS.has(e.name)) continue;
+      if (IGNORE_DIRS.has(e.name)) {
+        state.ignoredDirs += 1;
+        continue;
+      }
       await walk(p, state);
       continue;
     }
@@ -225,6 +228,7 @@ async function walk(dir, state) {
     if (CODE_EXTS.has(ext)) state.files.push(p);
     else if (e.name === 'package.json') state.packages.push(p);
     else if (/\.(md|txt|json|toml|ya?ml)$/i.test(e.name)) state.textFiles.push(p);
+    else state.skippedFiles += 1;
   }
 }
 
@@ -268,7 +272,14 @@ function candidatePaths(base) {
 
 export async function scanProject(rootDir) {
   const root = resolve(rootDir);
-  const state = { files: [], packages: [join(root, 'package.json')], textFiles: [] };
+  const state = {
+    files: [],
+    packages: [join(root, 'package.json')],
+    textFiles: [],
+    ignoredDirs: 0,
+    skippedFiles: 0,
+    unresolvedRelativeImports: 0,
+  };
   await walk(root, state);
   state.files.sort();
   const files = state.files;
@@ -716,6 +727,9 @@ export async function scanProject(rootDir) {
     for (const spec of specs) {
       const hit = resolveSpec(f, spec);
       if (hit) deps.add(hit);
+      else if (spec.startsWith('.') || spec.startsWith('@/') || spec.startsWith('~')) {
+        state.unresolvedRelativeImports += 1;
+      }
     }
     edges.set(f, [...deps]);
   }
@@ -1075,6 +1089,9 @@ export async function scanProject(rootDir) {
       frameworks,
       entryFiles: [...entries].map((f) => relative(root, f).replace(/\\/g, '/')).sort(),
       generatedFiles: generated.length,
+      ignoredDirs: state.ignoredDirs,
+      skippedFiles: state.skippedFiles,
+      unresolvedRelativeImports: state.unresolvedRelativeImports,
       deadByConfidence: byConfidence,
       hasPackage: Boolean(rootPkg),
     },

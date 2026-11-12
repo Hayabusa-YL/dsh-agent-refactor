@@ -18,6 +18,7 @@ node scripts/bench.mjs <repo...>  # 指定任意本地仓库
 | 死代码 | 14（按置信度，详见 latest.json） |
 | 未用依赖 | 2 |
 | 循环依赖 | 0 |
+| 可观测：排除目录 / 未扫描文件 / 解析失败 import | 5 / 31 / 6 |
 
 ## 2. 历史公开评测（归档自 longbench-harness）
 

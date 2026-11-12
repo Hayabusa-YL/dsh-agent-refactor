@@ -80,7 +80,7 @@
 
 **成本**：单组件完整拆分（分析 + 规划 + 生成，共 3 次 LLM 调用）约 2–3 万 token，按 DeepSeek 价格约 **3–5 分钱**；失败回喂修复每轮再加约 3 千 token。样本与记录见 `memory/audit/split-engine-2026-11-15.md`。
 
-**量化与公开评测**：本地基准 `node scripts/bench.mjs`（real-repo 391 文件 / 417ms / 死代码 14 / 未用依赖 2），历史 SWE-bench 47/47 补丁验证与 τ-bench retail 71.3% 等数据（含污染与口径限制）见 [benchmark/](benchmark/)。测试覆盖率 `npm run coverage`：行 94.25% / 分支 81.93% / 函数 87.81%。
+**量化与公开评测**：本地基准 `node scripts/bench.mjs`（real-repo 391 文件 / 417ms / 死代码 14 / 未用依赖 2），历史 SWE-bench 47/47 补丁验证与 τ-bench retail 71.3% 等数据（含污染与口径限制）见 [benchmark/](benchmark/)。测试覆盖率 `npm run coverage`：行 94.25% / 分支 81.93% / 函数 87.81%。扫描范围可观测：被排除目录、未扫描文件、解析失败的相对 import 数量都写进 meta，入口收窄不再静默。
 
 ## 诚实边界（先看这里）
 
