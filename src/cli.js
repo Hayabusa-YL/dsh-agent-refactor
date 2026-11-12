@@ -142,6 +142,43 @@ export function run(argv) {
     });
 
   program
+    .command('batch [path]')
+    .description('批量拆分：扫描项目里所有大组件，逐个走拆分流水线（单个失败不阻断后续）')
+    .option('--min-lines <n>', '大组件最小行数', '300')
+    .option('--max-files <n>', '最多处理多少个', '20')
+    .option('--dry-run', '只输出拆分计划')
+    .option('--yes', '确认生成并应用')
+    .action(async (target, opts) => {
+      const root = target ? resolve(target) : process.cwd();
+      const llm = createLLM();
+      if (!llm) {
+        console.log(chalk.red('  未配置模型接口：设置 AGENT_REFACTOR_LLM_BASE_URL / AGENT_REFACTOR_LLM_KEY / AGENT_REFACTOR_LLM_MODEL'));
+        process.exitCode = 1;
+        return;
+      }
+      try {
+        const { batchSplit } = await import('./batch.js');
+        const res = await batchSplit({
+          root,
+          llm,
+          minLines: Number(opts.minLines) || 300,
+          maxFiles: Number(opts.maxFiles) || 20,
+          dryRun: !!opts.dryRun,
+          yes: !!opts.yes,
+          onProgress: (entry, i, total) => {
+            const mark = entry.ok ? chalk.green('✔') : chalk.red('✘');
+            console.log(`${mark} [${i}/${total}] ${entry.file}${entry.message ? chalk.dim(` — ${entry.message}`) : ''}`);
+          },
+        });
+        console.log(chalk.bold(`\n  批量结果：${res.applied}/${res.total} 成功${res.failed ? `，${res.failed} 失败` : ''}`));
+        if (res.failed) process.exitCode = 1;
+      } catch (e) {
+        console.error(chalk.red(`  批量拆分失败：${e.message}`));
+        process.exitCode = 1;
+      }
+    });
+
+  program
     .command('analyze <file>')
     .description('分析任意巨型组件，输出 AI 拆分计划（不落地，无需项目构建）')
     .action(async (file) => {

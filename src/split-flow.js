@@ -8,6 +8,7 @@ import { analyzeComponent, planSplit, validatePlan, generateComponents, validate
 import { verifyBuild } from './verify.js';
 import { captureBehaviorBaseline, verifySplitRegression } from './regression.js';
 import { runCommand } from './fix.js';
+import { scanGeneratedSafety } from './safety.js';
 
 const MIN_LINES = 300;
 
@@ -36,9 +37,23 @@ export async function splitComponent({ root, componentRel, llm, dryRun = false, 
 
   if (!yes) return { ok: false, stage: 'confirm', plan, analysis, lines, message: '计划已生成，加 --yes 确认生成代码' };
 
-  const generated = await generateComponents(llm, code, plan, { path: componentRel });
+  let generated = await generateComponents(llm, code, plan, { path: componentRel });
   const genErrors = validateGenerated(generated, plan);
   if (genErrors.length) return { ok: false, stage: 'generate', plan, errors: genErrors };
+
+  // 静态安全审查：红线命中回喂一次，重生成仍命中则拒绝落盘
+  let safety = scanGeneratedSafety(generated);
+  if (!safety.ok) {
+    generated = await generateComponents(llm, code, plan, { path: componentRel, safetyIssues: safety.blockers });
+    const retryErrors = validateGenerated(generated, plan);
+    if (retryErrors.length) {
+      return { ok: false, stage: 'safety', plan, errors: [...safety.blockers.map((b) => `${b.file}: ${b.message}`), ...retryErrors] };
+    }
+    safety = scanGeneratedSafety(generated);
+    if (!safety.ok) {
+      return { ok: false, stage: 'safety', plan, errors: safety.blockers.map((b) => `${b.file}: ${b.message}`) };
+    }
+  }
 
   // 拆分前采集行为基线（原组件渲染 HTML），环境不支持时返回 null，后续走静态模式
   const baseline = await captureBehaviorBaseline(root, componentRel);
@@ -94,6 +109,7 @@ export async function splitComponent({ root, componentRel, llm, dryRun = false, 
       written,
       build: { command: build.command, ms: build.ms },
       regression: { mode: regression.mode, ms: regression.ms },
+      safety: { ok: safety.ok, warnings: safety.warnings },
       smoke: smoke ? { command: smoke.command, ms: smoke.ms } : null,
     };
   } catch (e) {

@@ -85,6 +85,7 @@
 - **门禁自动判定**：fix 跑 `testCommand`，split 跑 `buildCommand` + 可选 `verifyCommand`（如 SSR 冒烟）。
 - **失败自动回滚**：门禁不过，恢复全部文件，报告原始错误。
 - **默认 dry-run**：`--yes` 显式同意才落地；没测试命令默认拒绝修复。
+- **生成代码安全审查**：split 落盘前扫生成代码红线（eval / new Function / child_process / document.write），命中回喂模型重生成一次，仍命中拒绝落盘；dangerouslySetInnerHTML / innerHTML / 硬编码密钥只记警告。
 
 ## 快速开始
 
@@ -106,6 +107,7 @@ node bin/cli.js scan .
 node bin/cli.js fix . --dry-run   # 先看计划，确认后再加 --yes
 node bin/cli.js analyze fixtures/real-components/antd-InternalTable.tsx   # 需配 LLM
 node bin/cli.js split fixtures/giant-app/src/App.tsx --yes               # 需配 LLM
+node bin/cli.js batch . --dry-run                                       # 批量列出大组件拆分计划（--yes 才应用）
 ```
 
 > 已发布到 npm：`npx agent-refactor scan ./你的项目` 一行搞定（无需 clone 和 install）。
@@ -139,8 +141,8 @@ npm run gate
 - [x] split：LLM 分析 → 规划 → 生成 → 门禁（构建 / 快照 / 测试）→ 回归
 - [x] analyze：任意组件出拆分计划
 - [x] 真实组件对照（antd InternalTable 规划验证）
-- [ ] 生成代码静态安全审查（eval/外网请求拦截）
-- [ ] 批量拆分：扫全项目巨组件，逐个拆
+- [x] 生成代码静态安全审查（eval/new Function/child_process/document.write 红线，命中回喂重生成）
+- [x] 批量拆分：扫全项目巨组件，逐个拆，单个失败不阻断后续
 - [x] 真实仓库端到端构建验证（ant-design-pro advanced-form，构建 + 类型检查通过）
 - [x] GitHub Action：PR / push 自动体检评论（.github/workflows/self-scan.yml）
 - [x] 真实仓库回归语料（create-vue / ofetch / unplugin-auto-import，`npm run corpus` 复现）

@@ -98,12 +98,15 @@ const GENERATE_SYSTEM = `你是资深 React 工程师。按拆分计划生成完
 - 如果原型是 .jsx 就用 JSX，不要强行加类型。`;
 
 export async function generateComponents(llm, code, plan, meta = {}) {
+  const feedback = Array.isArray(meta.safetyIssues) && meta.safetyIssues.length
+    ? `\n\n上一次生成的代码被静态安全审查拦截，必须避免以下问题后重新生成全部文件：\n${meta.safetyIssues.map((b) => `- ${b.file}: ${b.message}`).join('\n')}`
+    : '';
   const content = await llm.chat(
     [
       { role: 'system', content: GENERATE_SYSTEM },
       {
         role: 'user',
-        content: `原组件路径：${meta.path || 'unknown'}\n\n拆分计划：\n${JSON.stringify(plan, null, 2)}\n\n完整源码：\n${code}`,
+        content: `原组件路径：${meta.path || 'unknown'}\n\n拆分计划：\n${JSON.stringify(plan, null, 2)}\n\n完整源码：\n${code}${feedback}`,
       },
     ],
     { json: true, maxTokens: 8000 },

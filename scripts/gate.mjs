@@ -76,6 +76,12 @@ await check('文档与版本同步', async () => {
   return { ok: problems.length === 0, detail: problems.length ? problems.join('；') : `v${pkg.version}` };
 });
 
+await check('路线图完成度（无遗留未完成项）', async () => {
+  const readme = await readFile(join(root, 'README.md'), 'utf8');
+  const pending = [...readme.matchAll(/^- \[ \] .+$/gm)].map((m) => m[0]);
+  return { ok: pending.length === 0, detail: pending.length ? `遗留 ${pending.length} 项：${pending.slice(0, 3).join(' / ')}` : '全部完成' };
+});
+
 const failed = results.filter((r) => !r.ok);
 for (const r of results) {
   console.log(`[${r.ok ? 'PASS' : 'FAIL'}] ${r.name} — ${r.detail}（${r.ms}ms）`);
