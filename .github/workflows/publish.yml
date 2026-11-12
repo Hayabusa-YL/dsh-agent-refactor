@@ -1,0 +1,32 @@
+name: publish
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: 'https://registry.npmjs.org'
+
+      # npm Trusted Publishing（OIDC）需要 npm >= 11.5
+      - name: Update npm
+        run: npm install -g npm@latest
+
+      - name: Run tests
+        run: node --test test/scan.test.js test/fix.test.js test/splitter.test.js test/split-flow.test.js test/frameworks.test.js
+
+      - name: Publish to npm
+        run: npm publish --access public --registry https://registry.npmjs.org
