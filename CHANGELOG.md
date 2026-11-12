@@ -1,11 +1,18 @@
 # 变更日志
 
-## [未发布]
+## [0.3.1] - 2026-11-12
 
 ### 新增
 
 - `fix` 静态安全门：项目没有可探测的测试命令时不再直接拒绝——应用前检查 package.json 入口字段（main/module/browser/types/bin/exports 等）是否指向将被删除的文件、git 工作区是否干净，全绿才动手；有测试命令的项目仍走测试门禁，结果标注「未跑测试」
 - 拆分回归验证：`split` 在构建门禁之后新增回归门——项目有 vitest/jest + @testing-library/react + jsdom 时，拆分前采集原组件渲染快照，拆分后自动生成对比测试并执行；环境不支持时生成 node:test 静态结构回归（父组件引用全部子组件、子组件有导出），失败同样自动回滚
+- 拆分行为快照真环境测试：临时 React 项目装 react18 + vitest + @testing-library/react + jsdom，验证等价拆分放行、渲染不等价拆分拦截并回滚（离线环境自动 skip）
+- 至臻门禁 `npm run gate`：全量测试 + real-repo 语料基线（未用依赖 ≤2、high 死代码不倒退、已知误报零回归）+ CLI 冒烟 + 文档版本同步，全项 PASS 才允许报完成；任一 FAIL 退出非 0
+
+### 修复
+
+- 未用依赖误报四修：react-dom 视为 React 项目框架渲染层运行时、scripts 里 CLI 命令按 node_modules bin 字段映射包名（biome→@biomejs/biome 等）、husky hooks 里点名的工具算使用、tsconfig `types` 数组点名的类型包算使用（@cloudflare/workers-types）；real-repo 未用依赖 6→2，剩余为确实无引用的工具链包
+- 行为回归在 Windows 下改用 `node node_modules/vitest/vitest.mjs` 入口（原 `node_modules/.bin/vitest` 正斜杠路径 cmd 解析失败）；测试文件补 React import；jest 路径改用 jest bin 入口 + `/** @jest-environment jsdom */`
 
 ## [0.3.0] - 2026-11-12
 

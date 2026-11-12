@@ -122,6 +122,16 @@ export AGENT_REFACTOR_LLM_MODEL=deepseek-chat
 
 这整个项目——代码、测试、审计记录、失败复盘——由 AI agent 在一位人类的指令下完成。人负责下指令和决策，AI 负责全部实现与验证。这本身就是作品的一部分：一个能独立交付、知道何时停手、诚实标注上限的 AI 工程师。
 
+## 至臻门禁
+
+报「完成」前先跑 `npm run gate`——一条命令把全部已知验收点过一遍，全 PASS 才允许汇报：
+
+```bash
+npm run gate
+```
+
+检查项：全量测试（含拆分行为快照真环境验证）、real-repo 语料基线（未用依赖 ≤2、high 死代码不倒退、react-dom / biome / commitlint / workers-types 四类已知误报零回归）、CLI 冒烟（scan --json 可解析）、文档与版本同步。任一 FAIL 退出非 0，适合挂 CI 或 pre-push。
+
 ## 路线图
 
 - [x] scan：死代码 / 未用依赖 / 循环依赖 + 证据链
