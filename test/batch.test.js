@@ -36,14 +36,20 @@ function makeLlm() {
           risks: [],
         });
       }
-      return JSON.stringify({
-        files: [
-          { path: 'src/components/Part.jsx', content: "import React from 'react';\nexport function Part() { return <i>1</i>; }\n" },
-          { path: 'src/components/Part2.jsx', content: "import React from 'react';\nexport function Part2() { return <i>2</i>; }\n" },
-          { path: 'src/hooks/useX.js', content: 'export function useX() { return 1; }\n' },
-        ],
-        parent: { path: 'src/components/BigOne.jsx', content: "import React from 'react';\nimport { Part } from './Part.jsx';\nimport { Part2 } from './Part2.jsx';\nimport { useX } from '../hooks/useX.js';\nexport default function BigOne() { useX(); return <><Part /><Part2 /></>; }\n" },
-      });
+      if (sys.includes('改造成父组件')) {
+        return JSON.stringify({ path: 'src/components/BigOne.jsx', content: "import React from 'react';\nimport { Part } from './Part.jsx';\nimport { Part2 } from './Part2.jsx';\nimport { useX } from '../hooks/useX.js';\nexport default function BigOne() { useX(); return <><Part /><Part2 /></>; }\n" });
+      }
+      const user = messages[1]?.content || '';
+      const matched = user.match(/"file": "([^"]+)"/);
+      if (matched) {
+        const path = matched[1];
+        if (path.endsWith('.js') && !path.includes('.jsx')) {
+          return JSON.stringify({ path, content: 'export function useX() { return 1; }\n' });
+        }
+        const name = path.includes('Part2') ? 'Part2' : 'Part';
+        return JSON.stringify({ path, content: `import React from 'react';\nexport function ${name}() { return <i>1</i>; }\n` });
+      }
+      return JSON.stringify({ path: 'src/components/BigOne.jsx', content: "import React from 'react';\nimport { Part } from './Part.jsx';\nimport { Part2 } from './Part2.jsx';\nimport { useX } from '../hooks/useX.js';\nexport default function BigOne() { useX(); return <><Part /><Part2 /></>; }\n" });
     },
   };
 }

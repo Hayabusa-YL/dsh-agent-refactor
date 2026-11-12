@@ -88,11 +88,18 @@ test('split retries generation exactly once when a red line is produced', async 
         if (sys.includes('输出语义地图')) return JSON.stringify(analysis);
         if (sys.includes('拆成 3-5')) return JSON.stringify(plan);
         generateCalls++;
-        return JSON.stringify(generateCalls === 1 ? dirty : retry);
+        const unitCount = plan.components.length + plan.hooks.length + 1;
+        const source = generateCalls > unitCount ? retry : dirty;
+        if (sys.includes('改造成父组件')) return JSON.stringify(source.parent);
+        const user = messages[1]?.content || '';
+        const matched = user.match(/"file": "([^"]+)"/);
+        const path = matched ? matched[1] : '';
+        const hit = source.files.find((f) => f.path === path);
+        return JSON.stringify({ path, content: hit ? hit.content : '' });
       },
     };
     const res = await splitComponent({ root: dir, componentRel: 'src/Big.jsx', llm, yes: true });
-    assert.equal(generateCalls, 2, 'must retry generation exactly once');
+    assert.equal(generateCalls, 2 * (plan.components.length + plan.hooks.length + 1), 'first full pass + exactly one safety retry pass');
     assert.equal(res.ok, true, JSON.stringify(res.errors || res));
   } finally {
     await rm(dir, { recursive: true, force: true });

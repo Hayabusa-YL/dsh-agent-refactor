@@ -1,0 +1,2553 @@
+[
+  {
+    "summary": {
+      "repo": "create-vue",
+      "scannedFiles": 101,
+      "frameworks": [],
+      "entries": 20,
+      "dead": 68,
+      "deadByConfidence": {
+        "high": 0,
+        "medium": 68,
+        "low": 0
+      },
+      "unusedDeps": 0,
+      "cycles": 0,
+      "topDead": [
+        "medium:scripts/run-without-warnings.mjs",
+        "medium:template/bare/base/src/App.vue",
+        "medium:template/bare/typescript/src/App.vue",
+        "medium:template/base/vite.config.js.data.mjs",
+        "medium:template/code/default/src/App.vue",
+        "medium:template/code/default/src/components/HelloWorld.vue",
+        "medium:template/code/default/src/components/icons/IconCommunity.vue",
+        "medium:template/code/default/src/components/icons/IconDocumentation.vue"
+      ]
+    },
+    "full": {
+      "meta": {
+        "tool": "agent-refactor",
+        "version": "0.2.0",
+        "scannedAt": "2026-11-12T01:50:19.943Z",
+        "root": "C:\\Users\\25670\\Desktop\\dsh-clean\\projects\\agent-refactor\\tmp\\corpus\\create-vue",
+        "scannedFiles": 101,
+        "frameworks": [],
+        "entryFiles": [
+          "__test__/getCommand.spec.ts",
+          "__test__/locale.spec.ts",
+          "__test__/resolveFeatures.spec.ts",
+          "__test__/runWithoutWarnings.spec.ts",
+          "__test__/sortDependencies.spec.ts",
+          "index.ts",
+          "rolldown.config.ts",
+          "scripts/release.mjs",
+          "scripts/snapshot.mjs",
+          "scripts/test.mjs",
+          "template/bare/cypress-ct/src/__tests__/App.cy.js",
+          "template/bare/vitest/src/__tests__/App.spec.js",
+          "template/config/cypress-ct/src/components/__tests__/HelloWorld.cy.js",
+          "template/config/cypress/cypress/e2e/example.cy.js",
+          "template/config/playwright/e2e/vue.spec.js",
+          "template/config/playwright/e2e/vue.spec.ts",
+          "template/config/playwright/playwright.config.js",
+          "template/config/vitest/src/components/__tests__/HelloWorld.spec.js",
+          "vite.config.ts",
+          "vitest.config.ts"
+        ],
+        "generatedFiles": 0,
+        "deadByConfidence": {
+          "high": 0,
+          "medium": 68,
+          "low": 0
+        },
+        "hasPackage": true
+      },
+      "deadFiles": [
+        {
+          "file": "scripts/run-without-warnings.mjs",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 101 个源文件",
+            "0 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：__test__\\runWithoutWarnings.spec.ts 中的路径字符串"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "template/bare/base/src/App.vue",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 101 个源文件",
+            "0 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "template/bare/typescript/src/App.vue",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 101 个源文件",
+            "0 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "template/base/vite.config.js.data.mjs",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 101 个源文件",
+            "0 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "template/code/default/src/App.vue",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 101 个源文件",
+            "0 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "template/code/default/src/components/HelloWorld.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\default\\src\\App.vue",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\default\\src\\App.vue（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/code/default/src/components/icons/IconCommunity.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\default\\src\\components\\TheWelcome.vue",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\default\\src\\components\\TheWelcome.vue（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/code/default/src/components/icons/IconDocumentation.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\default\\src\\components\\TheWelcome.vue",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\default\\src\\components\\TheWelcome.vue（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/code/default/src/components/icons/IconEcosystem.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\default\\src\\components\\TheWelcome.vue",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\default\\src\\components\\TheWelcome.vue（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/code/default/src/components/icons/IconSupport.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\default\\src\\components\\TheWelcome.vue",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\default\\src\\components\\TheWelcome.vue（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/code/default/src/components/icons/IconTooling.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\default\\src\\components\\TheWelcome.vue",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\default\\src\\components\\TheWelcome.vue（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/code/default/src/components/TheWelcome.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\default\\src\\App.vue",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\default\\src\\App.vue（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/code/default/src/components/WelcomeItem.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\default\\src\\components\\TheWelcome.vue",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\default\\src\\components\\TheWelcome.vue（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/code/router/src/App.vue",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 101 个源文件",
+            "0 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "template/code/router/src/components/HelloWorld.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\router\\src\\App.vue",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\router\\src\\App.vue（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/code/router/src/components/icons/IconCommunity.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\router\\src\\components\\TheWelcome.vue",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\router\\src\\components\\TheWelcome.vue（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/code/router/src/components/icons/IconDocumentation.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\router\\src\\components\\TheWelcome.vue",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\router\\src\\components\\TheWelcome.vue（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/code/router/src/components/icons/IconEcosystem.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\router\\src\\components\\TheWelcome.vue",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\router\\src\\components\\TheWelcome.vue（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/code/router/src/components/icons/IconSupport.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\router\\src\\components\\TheWelcome.vue",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\router\\src\\components\\TheWelcome.vue（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/code/router/src/components/icons/IconTooling.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\router\\src\\components\\TheWelcome.vue",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\router\\src\\components\\TheWelcome.vue（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/code/router/src/components/TheWelcome.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\router\\src\\views\\HomeView.vue",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\router\\src\\views\\HomeView.vue（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/code/router/src/components/WelcomeItem.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\router\\src\\components\\TheWelcome.vue",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\router\\src\\components\\TheWelcome.vue（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/code/router/src/router/index.js",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 101 个源文件",
+            "0 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "template/code/router/src/views/AboutView.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\router\\src\\router\\index.js",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\router\\src\\router\\index.js（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/code/router/src/views/HomeView.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\router\\src\\router\\index.js",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\router\\src\\router\\index.js（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/code/typescript-default/src/App.vue",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 101 个源文件",
+            "0 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "template/code/typescript-default/src/components/HelloWorld.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\typescript-default\\src\\App.vue",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\typescript-default\\src\\App.vue（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/code/typescript-default/src/components/icons/IconCommunity.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\typescript-default\\src\\components\\TheWelcome.vue",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\typescript-default\\src\\components\\TheWelcome.vue（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/code/typescript-default/src/components/icons/IconDocumentation.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\typescript-default\\src\\components\\TheWelcome.vue",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\typescript-default\\src\\components\\TheWelcome.vue（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/code/typescript-default/src/components/icons/IconEcosystem.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\typescript-default\\src\\components\\TheWelcome.vue",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\typescript-default\\src\\components\\TheWelcome.vue（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/code/typescript-default/src/components/icons/IconSupport.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\typescript-default\\src\\components\\TheWelcome.vue",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\typescript-default\\src\\components\\TheWelcome.vue（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/code/typescript-default/src/components/icons/IconTooling.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\typescript-default\\src\\components\\TheWelcome.vue",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\typescript-default\\src\\components\\TheWelcome.vue（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/code/typescript-default/src/components/TheWelcome.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\typescript-default\\src\\App.vue",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\typescript-default\\src\\App.vue（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/code/typescript-default/src/components/WelcomeItem.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\typescript-default\\src\\components\\TheWelcome.vue",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\typescript-default\\src\\components\\TheWelcome.vue（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/code/typescript-router/src/App.vue",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 101 个源文件",
+            "0 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "template/code/typescript-router/src/components/HelloWorld.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\typescript-router\\src\\App.vue",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\typescript-router\\src\\App.vue（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/code/typescript-router/src/components/icons/IconCommunity.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\typescript-router\\src\\components\\TheWelcome.vue",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\typescript-router\\src\\components\\TheWelcome.vue（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/code/typescript-router/src/components/icons/IconDocumentation.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\typescript-router\\src\\components\\TheWelcome.vue",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\typescript-router\\src\\components\\TheWelcome.vue（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/code/typescript-router/src/components/icons/IconEcosystem.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\typescript-router\\src\\components\\TheWelcome.vue",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\typescript-router\\src\\components\\TheWelcome.vue（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/code/typescript-router/src/components/icons/IconSupport.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\typescript-router\\src\\components\\TheWelcome.vue",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\typescript-router\\src\\components\\TheWelcome.vue（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/code/typescript-router/src/components/icons/IconTooling.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\typescript-router\\src\\components\\TheWelcome.vue",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\typescript-router\\src\\components\\TheWelcome.vue（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/code/typescript-router/src/components/TheWelcome.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\typescript-router\\src\\views\\HomeView.vue",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\typescript-router\\src\\views\\HomeView.vue（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/code/typescript-router/src/components/WelcomeItem.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\typescript-router\\src\\components\\TheWelcome.vue",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\typescript-router\\src\\components\\TheWelcome.vue（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/code/typescript-router/src/router/index.ts",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 101 个源文件",
+            "0 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "template/code/typescript-router/src/views/AboutView.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\typescript-router\\src\\router\\index.ts",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\typescript-router\\src\\router\\index.ts（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/code/typescript-router/src/views/HomeView.vue",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\code\\typescript-router\\src\\router\\index.ts",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\code\\typescript-router\\src\\router\\index.ts（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/config/cypress-ct/cypress.config.js",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 101 个源文件",
+            "0 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "template/config/cypress-ct/cypress/support/component.js",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 101 个源文件",
+            "0 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "template/config/cypress-ct/cypress/support/component.ts",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 101 个源文件",
+            "0 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "template/config/cypress/cypress.config.js",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 101 个源文件",
+            "0 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "template/config/cypress/cypress/support/commands.js",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 101 个源文件",
+            "0 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "template/config/cypress/cypress/support/commands.ts",
+          "confidence": "medium",
+          "inbound": 1,
+          "refs": [
+            {
+              "file": "template\\config\\cypress\\cypress\\support\\e2e.js",
+              "reachable": false
+            }
+          ],
+          "evidence": [
+            "扫描 101 个源文件",
+            "1 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "template\\config\\cypress\\cypress\\support\\e2e.js（自身也不可达）"
+          ]
+        },
+        {
+          "file": "template/config/cypress/cypress/support/e2e.js",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 101 个源文件",
+            "0 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "template/config/jsx/vite.config.js.data.mjs",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 101 个源文件",
+            "0 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "template/config/pinia/src/stores/counter.js",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 101 个源文件",
+            "0 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "template/config/typescript/env.d.ts",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 101 个源文件",
+            "0 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "template/entry/default/src/main.js",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 101 个源文件",
+            "0 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "template/entry/pinia/src/main.js",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 101 个源文件",
+            "0 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "template/entry/router-and-pinia/src/main.js",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 101 个源文件",
+            "0 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "template/entry/router/src/main.js",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 101 个源文件",
+            "0 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "template/linting/core/js/eslint.config.js.data.mjs",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 101 个源文件",
+            "0 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "template/linting/core/ts/eslint.config.js.data.mjs",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 101 个源文件",
+            "0 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "template/linting/cypress-ct/eslint.config.js.data.mjs",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 101 个源文件",
+            "0 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "template/linting/cypress/eslint.config.js.data.mjs",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 101 个源文件",
+            "0 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "template/linting/formatter/eslint.config.js.data.mjs",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 101 个源文件",
+            "0 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "template/linting/oxlint/eslint.config.js.data.mjs",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 101 个源文件",
+            "0 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "template/linting/playwright/eslint.config.js.data.mjs",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 101 个源文件",
+            "0 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "template/linting/vitest/eslint.config.js.data.mjs",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 101 个源文件",
+            "0 处 import/require 引用它",
+            "从 20 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        }
+      ],
+      "unusedDeps": [],
+      "toolchainDeps": [
+        {
+          "name": "@types/node",
+          "workspace": null,
+          "note": "工具链依赖，通常不删"
+        }
+      ],
+      "cycles": []
+    }
+  },
+  {
+    "summary": {
+      "repo": "express",
+      "scannedFiles": 140,
+      "frameworks": [],
+      "entries": 134,
+      "dead": 0,
+      "deadByConfidence": {
+        "high": 0,
+        "medium": 0,
+        "low": 0
+      },
+      "unusedDeps": 1,
+      "cycles": 0,
+      "topDead": []
+    },
+    "full": {
+      "meta": {
+        "tool": "agent-refactor",
+        "version": "0.2.0",
+        "scannedAt": "2026-11-12T01:50:20.014Z",
+        "root": "C:\\Users\\25670\\Desktop\\dsh-clean\\projects\\agent-refactor\\tmp\\corpus\\express",
+        "scannedFiles": 140,
+        "frameworks": [],
+        "entryFiles": [
+          "examples/auth/index.js",
+          "examples/content-negotiation/db.js",
+          "examples/content-negotiation/index.js",
+          "examples/content-negotiation/users.js",
+          "examples/cookie-sessions/index.js",
+          "examples/cookies/index.js",
+          "examples/downloads/index.js",
+          "examples/ejs/index.js",
+          "examples/error-pages/index.js",
+          "examples/error/index.js",
+          "examples/hello-world/index.js",
+          "examples/markdown/index.js",
+          "examples/multi-router/controllers/api_v1.js",
+          "examples/multi-router/controllers/api_v2.js",
+          "examples/multi-router/index.js",
+          "examples/mvc/controllers/main/index.js",
+          "examples/mvc/controllers/pet/index.js",
+          "examples/mvc/controllers/user-pet/index.js",
+          "examples/mvc/controllers/user/index.js",
+          "examples/mvc/db.js",
+          "examples/mvc/index.js",
+          "examples/mvc/lib/boot.js",
+          "examples/online/index.js",
+          "examples/params/index.js",
+          "examples/resource/index.js",
+          "examples/route-map/index.js",
+          "examples/route-middleware/index.js",
+          "examples/route-separation/index.js",
+          "examples/route-separation/post.js",
+          "examples/route-separation/site.js",
+          "examples/route-separation/user.js",
+          "examples/search/index.js",
+          "examples/session/index.js",
+          "examples/session/redis.js",
+          "examples/static-files/index.js",
+          "examples/vhost/index.js",
+          "examples/view-constructor/github-view.js",
+          "examples/view-constructor/index.js",
+          "examples/view-locals/index.js",
+          "examples/view-locals/user.js",
+          "examples/web-service/index.js",
+          "index.js",
+          "test/Route.js",
+          "test/Router.js",
+          "test/acceptance/auth.js",
+          "test/acceptance/content-negotiation.js",
+          "test/acceptance/cookie-sessions.js",
+          "test/acceptance/cookies.js",
+          "test/acceptance/downloads.js",
+          "test/acceptance/ejs.js",
+          "test/acceptance/error-pages.js",
+          "test/acceptance/error.js",
+          "test/acceptance/hello-world.js",
+          "test/acceptance/markdown.js",
+          "test/acceptance/multi-router.js",
+          "test/acceptance/mvc.js",
+          "test/acceptance/params.js",
+          "test/acceptance/resource.js",
+          "test/acceptance/route-map.js",
+          "test/acceptance/route-separation.js",
+          "test/acceptance/vhost.js",
+          "test/acceptance/web-service.js",
+          "test/app.all.js",
+          "test/app.engine.js",
+          "test/app.head.js",
+          "test/app.js",
+          "test/app.listen.js",
+          "test/app.locals.js",
+          "test/app.options.js",
+          "test/app.param.js",
+          "test/app.render.js",
+          "test/app.request.js",
+          "test/app.response.js",
+          "test/app.route.js",
+          "test/app.router.js",
+          "test/app.routes.error.js",
+          "test/app.use.js",
+          "test/config.js",
+          "test/exports.js",
+          "test/express.json.js",
+          "test/express.raw.js",
+          "test/express.static.js",
+          "test/express.text.js",
+          "test/express.urlencoded.js",
+          "test/middleware.basic.js",
+          "test/regression.js",
+          "test/req.accepts.js",
+          "test/req.acceptsCharsets.js",
+          "test/req.acceptsEncodings.js",
+          "test/req.acceptsLanguages.js",
+          "test/req.baseUrl.js",
+          "test/req.fresh.js",
+          "test/req.get.js",
+          "test/req.host.js",
+          "test/req.hostname.js",
+          "test/req.ip.js",
+          "test/req.ips.js",
+          "test/req.is.js",
+          "test/req.path.js",
+          "test/req.protocol.js",
+          "test/req.query.js",
+          "test/req.range.js",
+          "test/req.route.js",
+          "test/req.secure.js",
+          "test/req.signedCookies.js",
+          "test/req.stale.js",
+          "test/req.subdomains.js",
+          "test/req.xhr.js",
+          "test/res.append.js",
+          "test/res.attachment.js",
+          "test/res.clearCookie.js",
+          "test/res.cookie.js",
+          "test/res.download.js",
+          "test/res.format.js",
+          "test/res.get.js",
+          "test/res.json.js",
+          "test/res.jsonp.js",
+          "test/res.links.js",
+          "test/res.locals.js",
+          "test/res.location.js",
+          "test/res.redirect.js",
+          "test/res.render.js",
+          "test/res.send.js",
+          "test/res.sendFile.js",
+          "test/res.sendStatus.js",
+          "test/res.set.js",
+          "test/res.status.js",
+          "test/res.type.js",
+          "test/res.vary.js",
+          "test/support/env.js",
+          "test/support/tmpl.js",
+          "test/support/utils.js",
+          "test/utils.js",
+          "test/view.js"
+        ],
+        "generatedFiles": 0,
+        "deadByConfidence": {
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "hasPackage": true
+      },
+      "deadFiles": [],
+      "unusedDeps": [
+        {
+          "name": "hbs",
+          "workspace": null,
+          "evidence": "扫描 140 个源文件，全仓库无 import/require 命中"
+        }
+      ],
+      "toolchainDeps": [],
+      "cycles": []
+    }
+  },
+  {
+    "summary": {
+      "repo": "hono",
+      "scannedFiles": 454,
+      "frameworks": [],
+      "entries": 309,
+      "dead": 0,
+      "deadByConfidence": {
+        "high": 0,
+        "medium": 0,
+        "low": 0
+      },
+      "unusedDeps": 0,
+      "cycles": 6,
+      "topDead": []
+    },
+    "full": {
+      "meta": {
+        "tool": "agent-refactor",
+        "version": "0.2.0",
+        "scannedAt": "2026-11-12T01:50:20.371Z",
+        "root": "C:\\Users\\25670\\Desktop\\dsh-clean\\projects\\agent-refactor\\tmp\\corpus\\hono",
+        "scannedFiles": 454,
+        "frameworks": [],
+        "entryFiles": [
+          "adapters/aws-lambda/src/conninfo.test.ts",
+          "adapters/aws-lambda/src/handler.test.ts",
+          "adapters/aws-lambda/src/index.ts",
+          "adapters/aws-lambda/test/index.test.ts",
+          "adapters/aws-lambda/test/mock.ts",
+          "adapters/aws-lambda/test/stream-backpressure.test.ts",
+          "adapters/aws-lambda/test/stream-mock.ts",
+          "adapters/aws-lambda/test/stream.test.ts",
+          "adapters/aws-lambda/vite.config.ts",
+          "adapters/bun/src/conninfo.test.ts",
+          "adapters/bun/src/index.ts",
+          "adapters/bun/src/server.test.ts",
+          "adapters/bun/src/server.ts",
+          "adapters/bun/src/websocket.test.ts",
+          "adapters/bun/test/index.test.ts",
+          "adapters/bun/vite.config.ts",
+          "adapters/cloudflare-workers/src/conninfo.test.ts",
+          "adapters/cloudflare-workers/src/index.ts",
+          "adapters/cloudflare-workers/src/serve-static.test.ts",
+          "adapters/cloudflare-workers/src/utils.test.ts",
+          "adapters/cloudflare-workers/src/websocket.test.ts",
+          "adapters/cloudflare-workers/test/websocket.test.ts",
+          "adapters/cloudflare-workers/test/worker.ts",
+          "adapters/cloudflare-workers/vite.config.ts",
+          "adapters/deno/src/conninfo.test.ts",
+          "adapters/deno/src/index.ts",
+          "adapters/deno/src/websocket.test.ts",
+          "adapters/deno/test/assert.ts",
+          "adapters/deno/test/serve-static.test.ts",
+          "adapters/deno/test/ssg.test.ts",
+          "adapters/deno/vite.config.ts",
+          "adapters/lambda-edge/src/conninfo.test.ts",
+          "adapters/lambda-edge/src/handler.test.ts",
+          "adapters/lambda-edge/src/index.ts",
+          "adapters/lambda-edge/test/index.test.ts",
+          "adapters/lambda-edge/vite.config.ts",
+          "adapters/netlify/src/conninfo.test.ts",
+          "adapters/netlify/src/index.ts",
+          "adapters/netlify/vite.config.ts",
+          "adapters/service-worker/src/handler.test.ts",
+          "adapters/service-worker/src/index.ts",
+          "adapters/service-worker/vite.config.ts",
+          "adapters/vercel/src/conninfo.test.ts",
+          "adapters/vercel/src/handler.test.ts",
+          "adapters/vercel/src/index.ts",
+          "adapters/vercel/vite.config.ts",
+          "benchmarks/fetch/bench.mts",
+          "benchmarks/fetch/summarize.mts",
+          "benchmarks/fetch/ts-resolve.mjs",
+          "benchmarks/http-server/benchmark.ts",
+          "benchmarks/jsx-dom/benchmark.ts",
+          "benchmarks/jsx/src/benchmark.ts",
+          "benchmarks/jsx/src/hono.ts",
+          "benchmarks/jsx/src/nano.ts",
+          "benchmarks/jsx/src/page-react.tsx",
+          "benchmarks/jsx/src/page.tsx",
+          "benchmarks/jsx/src/preact.ts",
+          "benchmarks/jsx/src/react-jsx/benchmark.ts",
+          "benchmarks/jsx/src/react-jsx/hono.ts",
+          "benchmarks/jsx/src/react-jsx/nano.ts",
+          "benchmarks/jsx/src/react-jsx/page-hono.tsx",
+          "benchmarks/jsx/src/react-jsx/page-nano.tsx",
+          "benchmarks/jsx/src/react-jsx/page-preact.tsx",
+          "benchmarks/jsx/src/react-jsx/page-react.tsx",
+          "benchmarks/jsx/src/react-jsx/preact.ts",
+          "benchmarks/jsx/src/react-jsx/react.ts",
+          "benchmarks/jsx/src/react.ts",
+          "benchmarks/query-param/src/bench.mts",
+          "benchmarks/query-param/src/fast-querystring.mts",
+          "benchmarks/query-param/src/hono.mts",
+          "benchmarks/query-param/src/qs.mts",
+          "benchmarks/routers-deno/src/bench.mts",
+          "benchmarks/routers-deno/src/find-my-way.mts",
+          "benchmarks/routers-deno/src/hono.mts",
+          "benchmarks/routers-deno/src/koa-router.mts",
+          "benchmarks/routers-deno/src/koa-tree-router.mts",
+          "benchmarks/routers-deno/src/medley-router.mts",
+          "benchmarks/routers-deno/src/tool.mts",
+          "benchmarks/routers-deno/src/trek-router.mts",
+          "benchmarks/routers/src/bench-includes-init.mts",
+          "benchmarks/routers/src/bench.mts",
+          "benchmarks/routers/src/express.mts",
+          "benchmarks/routers/src/find-my-way.mts",
+          "benchmarks/routers/src/hono.mts",
+          "benchmarks/routers/src/koa-router.mts",
+          "benchmarks/routers/src/koa-tree-router.mts",
+          "benchmarks/routers/src/medley-router.mts",
+          "benchmarks/routers/src/memoirist.mts",
+          "benchmarks/routers/src/radix3.mts",
+          "benchmarks/routers/src/rou3.mts",
+          "benchmarks/routers/src/tool.mts",
+          "benchmarks/routers/src/trek-router.mts",
+          "benchmarks/utils/src/get-path.ts",
+          "benchmarks/utils/src/loop.js",
+          "runtime-tests/bun/color.test.ts",
+          "runtime-tests/bun/index.test.tsx",
+          "runtime-tests/deno-jsx/jsx.test.tsx",
+          "runtime-tests/deno/hono.test.ts",
+          "runtime-tests/deno/middleware.test.tsx",
+          "runtime-tests/deno/stream.test.ts",
+          "runtime-tests/fastly/index.test.ts",
+          "runtime-tests/fastly/vitest.config.ts",
+          "runtime-tests/node/index.test.ts",
+          "runtime-tests/node/vitest.config.ts",
+          "runtime-tests/workerd/index.test.ts",
+          "runtime-tests/workerd/vitest.config.ts",
+          "src/adapter/aws-lambda/conninfo.test.ts",
+          "src/adapter/aws-lambda/handler.test.ts",
+          "src/adapter/aws-lambda/index.ts",
+          "src/adapter/bun/conninfo.test.ts",
+          "src/adapter/bun/index.ts",
+          "src/adapter/bun/server.test.ts",
+          "src/adapter/bun/websocket.test.ts",
+          "src/adapter/cloudflare-pages/conninfo.test.ts",
+          "src/adapter/cloudflare-pages/handler.test.ts",
+          "src/adapter/cloudflare-pages/index.ts",
+          "src/adapter/cloudflare-workers/conninfo.test.ts",
+          "src/adapter/cloudflare-workers/index.ts",
+          "src/adapter/cloudflare-workers/serve-static.test.ts",
+          "src/adapter/cloudflare-workers/utils.test.ts",
+          "src/adapter/cloudflare-workers/websocket.test.ts",
+          "src/adapter/deno/conninfo.test.ts",
+          "src/adapter/deno/index.ts",
+          "src/adapter/deno/websocket.test.ts",
+          "src/adapter/lambda-edge/conninfo.test.ts",
+          "src/adapter/lambda-edge/handler.test.ts",
+          "src/adapter/lambda-edge/index.ts",
+          "src/adapter/netlify/conninfo.test.ts",
+          "src/adapter/netlify/index.ts",
+          "src/adapter/service-worker/handler.test.ts",
+          "src/adapter/service-worker/index.ts",
+          "src/adapter/vercel/conninfo.test.ts",
+          "src/adapter/vercel/handler.test.ts",
+          "src/adapter/vercel/index.ts",
+          "src/client/client.test.ts",
+          "src/client/index.ts",
+          "src/client/types.test.ts",
+          "src/client/utils.test.ts",
+          "src/compose.test.ts",
+          "src/context.test.ts",
+          "src/helper/accepts/accepts.test.ts",
+          "src/helper/accepts/index.ts",
+          "src/helper/adapter/index.test.ts",
+          "src/helper/adapter/index.ts",
+          "src/helper/conninfo/index.ts",
+          "src/helper/cookie/index.test.ts",
+          "src/helper/cookie/index.ts",
+          "src/helper/css/common.case.test.tsx",
+          "src/helper/css/index.test.tsx",
+          "src/helper/css/index.ts",
+          "src/helper/dev/index.test.ts",
+          "src/helper/dev/index.ts",
+          "src/helper/factory/index.test.ts",
+          "src/helper/factory/index.ts",
+          "src/helper/html/index.test.ts",
+          "src/helper/html/index.ts",
+          "src/helper/proxy/index.test.ts",
+          "src/helper/proxy/index.ts",
+          "src/helper/route/index.test.ts",
+          "src/helper/route/index.ts",
+          "src/helper/ssg/index.ts",
+          "src/helper/ssg/plugins.test.tsx",
+          "src/helper/ssg/ssg.test.tsx",
+          "src/helper/ssg/utils.test.ts",
+          "src/helper/streaming/index.ts",
+          "src/helper/streaming/sse.test.tsx",
+          "src/helper/streaming/stream.test.ts",
+          "src/helper/streaming/text.test.ts",
+          "src/helper/testing/index.test.ts",
+          "src/helper/testing/index.ts",
+          "src/helper/websocket/index.test.ts",
+          "src/helper/websocket/index.ts",
+          "src/hono-base.ts",
+          "src/hono.test.ts",
+          "src/http-exception.test.ts",
+          "src/http-exception.ts",
+          "src/index.ts",
+          "src/jsx/base.test.tsx",
+          "src/jsx/children.test.ts",
+          "src/jsx/components.test.tsx",
+          "src/jsx/context-isolation.test.ts",
+          "src/jsx/dom/client.test.tsx",
+          "src/jsx/dom/client.ts",
+          "src/jsx/dom/components.test.tsx",
+          "src/jsx/dom/context.test.tsx",
+          "src/jsx/dom/css.test.tsx",
+          "src/jsx/dom/css.ts",
+          "src/jsx/dom/hooks/index.test.tsx",
+          "src/jsx/dom/index.test.tsx",
+          "src/jsx/dom/index.ts",
+          "src/jsx/dom/intrinsic-element/components.test.tsx",
+          "src/jsx/dom/jsx-dev-runtime.ts",
+          "src/jsx/dom/jsx-runtime.ts",
+          "src/jsx/dom/server.test.tsx",
+          "src/jsx/dom/server.ts",
+          "src/jsx/hooks/dom.test.tsx",
+          "src/jsx/hooks/string.test.tsx",
+          "src/jsx/index.test.tsx",
+          "src/jsx/index.ts",
+          "src/jsx/intrinsic-element/components.test.tsx",
+          "src/jsx/jsx-dev-runtime.ts",
+          "src/jsx/jsx-runtime.test.tsx",
+          "src/jsx/jsx-runtime.ts",
+          "src/jsx/streaming.test.tsx",
+          "src/jsx/streaming.ts",
+          "src/jsx/utils.test.ts",
+          "src/middleware/basic-auth/index.test.ts",
+          "src/middleware/basic-auth/index.ts",
+          "src/middleware/bearer-auth/index.test.ts",
+          "src/middleware/bearer-auth/index.ts",
+          "src/middleware/body-limit/index.test.ts",
+          "src/middleware/body-limit/index.ts",
+          "src/middleware/cache/index.test.ts",
+          "src/middleware/cache/index.ts",
+          "src/middleware/combine/index.test.ts",
+          "src/middleware/combine/index.ts",
+          "src/middleware/compress/index.test.ts",
+          "src/middleware/compress/index.ts",
+          "src/middleware/context-storage/index.test.ts",
+          "src/middleware/context-storage/index.ts",
+          "src/middleware/cors/index.test.ts",
+          "src/middleware/cors/index.ts",
+          "src/middleware/csrf/index.test.ts",
+          "src/middleware/csrf/index.ts",
+          "src/middleware/etag/digest.test.ts",
+          "src/middleware/etag/index.test.ts",
+          "src/middleware/etag/index.ts",
+          "src/middleware/ip-restriction/index.test.ts",
+          "src/middleware/ip-restriction/index.ts",
+          "src/middleware/jsx-renderer/index.test.tsx",
+          "src/middleware/jsx-renderer/index.ts",
+          "src/middleware/jwk/index.test.ts",
+          "src/middleware/jwk/index.ts",
+          "src/middleware/jwt/index.test.ts",
+          "src/middleware/jwt/index.ts",
+          "src/middleware/language/index.test.ts",
+          "src/middleware/language/index.ts",
+          "src/middleware/logger/index.test.ts",
+          "src/middleware/logger/index.ts",
+          "src/middleware/method-not-allowed/index.test.ts",
+          "src/middleware/method-not-allowed/index.ts",
+          "src/middleware/method-override/index.test.ts",
+          "src/middleware/method-override/index.ts",
+          "src/middleware/mount/index.test.ts",
+          "src/middleware/mount/index.ts",
+          "src/middleware/powered-by/index.test.ts",
+          "src/middleware/powered-by/index.ts",
+          "src/middleware/pretty-json/index.test.ts",
+          "src/middleware/pretty-json/index.ts",
+          "src/middleware/request-id/index.test.ts",
+          "src/middleware/request-id/index.ts",
+          "src/middleware/secure-headers/index.test.ts",
+          "src/middleware/secure-headers/index.ts",
+          "src/middleware/serve-static/index.test.ts",
+          "src/middleware/serve-static/index.ts",
+          "src/middleware/serve-static/path.test.ts",
+          "src/middleware/timeout/index.test.ts",
+          "src/middleware/timeout/index.ts",
+          "src/middleware/timing/index.test.ts",
+          "src/middleware/timing/index.ts",
+          "src/middleware/trailing-slash/index.test.ts",
+          "src/middleware/trailing-slash/index.ts",
+          "src/preset/quick.test.ts",
+          "src/preset/quick.ts",
+          "src/preset/tiny.test.ts",
+          "src/preset/tiny.ts",
+          "src/request.test.ts",
+          "src/request.ts",
+          "src/router.ts",
+          "src/router/common.case.test.ts",
+          "src/router/linear-router/index.ts",
+          "src/router/linear-router/router.test.ts",
+          "src/router/pattern-router/index.ts",
+          "src/router/pattern-router/router.test.ts",
+          "src/router/reg-exp-router/index.ts",
+          "src/router/reg-exp-router/prepared-router.test.ts",
+          "src/router/reg-exp-router/router.test.ts",
+          "src/router/smart-router/index.ts",
+          "src/router/smart-router/router.test.ts",
+          "src/router/trie-router/index.ts",
+          "src/router/trie-router/node.test.ts",
+          "src/router/trie-router/router.test.ts",
+          "src/types.test.ts",
+          "src/types.ts",
+          "src/utils/accept.test.ts",
+          "src/utils/basic-auth.test.ts",
+          "src/utils/body.test.ts",
+          "src/utils/buffer.test.ts",
+          "src/utils/color.test.ts",
+          "src/utils/concurrent.test.ts",
+          "src/utils/cookie.test.ts",
+          "src/utils/crypto.test.ts",
+          "src/utils/encode.test.ts",
+          "src/utils/filepath.test.ts",
+          "src/utils/html.test.ts",
+          "src/utils/ipaddr.test.ts",
+          "src/utils/jwt/index.ts",
+          "src/utils/jwt/jwa.test.ts",
+          "src/utils/jwt/jwt.test.ts",
+          "src/utils/mime.test.ts",
+          "src/utils/mount.test.ts",
+          "src/utils/stream.test.ts",
+          "src/utils/types.test.ts",
+          "src/utils/url.test.ts",
+          "src/validator/index.ts",
+          "src/validator/utils.test.ts",
+          "src/validator/validator.test.ts",
+          "vite.config.ts",
+          "vitest.config.ts"
+        ],
+        "generatedFiles": 0,
+        "deadByConfidence": {
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "hasPackage": true
+      },
+      "deadFiles": [],
+      "unusedDeps": [],
+      "toolchainDeps": [
+        {
+          "name": "@types/jsdom",
+          "workspace": null,
+          "note": "工具链依赖，通常不删"
+        },
+        {
+          "name": "@types/node",
+          "workspace": null,
+          "note": "工具链依赖，通常不删"
+        },
+        {
+          "name": "@types/ws",
+          "workspace": null,
+          "note": "工具链依赖，通常不删"
+        },
+        {
+          "name": "@typescript/native-preview",
+          "workspace": null,
+          "note": "工具链依赖，通常不删"
+        },
+        {
+          "name": "bun-types",
+          "workspace": null,
+          "note": "工具链依赖，通常不删"
+        },
+        {
+          "name": "@types/ws",
+          "workspace": "adapters/cloudflare-workers",
+          "note": "工具链依赖，通常不删"
+        },
+        {
+          "name": "@types/node",
+          "workspace": "adapters/deno",
+          "note": "工具链依赖，通常不删"
+        }
+      ],
+      "cycles": [
+        [
+          "adapters\\aws-lambda\\src\\handler.ts",
+          "adapters\\aws-lambda\\src\\index.ts",
+          "adapters\\aws-lambda\\src\\conninfo.ts"
+        ],
+        [
+          "src\\utils\\body.ts",
+          "src\\utils\\mount.ts",
+          "src\\helper\\route\\index.ts",
+          "src\\compose.ts",
+          "src\\hono-base.ts",
+          "src\\types.ts",
+          "src\\request.ts",
+          "src\\context.ts"
+        ],
+        [
+          "src\\helper\\ssg\\plugins.ts",
+          "src\\helper\\ssg\\ssg.ts"
+        ],
+        [
+          "src\\jsx\\streaming.ts",
+          "src\\jsx\\dom\\hooks\\index.ts",
+          "src\\jsx\\dom\\intrinsic-element\\components.ts",
+          "src\\jsx\\dom\\jsx-dev-runtime.ts",
+          "src\\jsx\\dom\\jsx-runtime.ts",
+          "src\\jsx\\dom\\components.ts",
+          "src\\jsx\\components.ts",
+          "src\\jsx\\dom\\render.ts",
+          "src\\jsx\\hooks\\index.ts",
+          "src\\jsx\\types.ts",
+          "src\\jsx\\children.ts",
+          "src\\jsx\\intrinsic-element\\components.ts",
+          "src\\jsx\\intrinsic-element\\common.ts",
+          "src\\jsx\\dom\\context.ts",
+          "src\\jsx\\context.ts",
+          "src\\jsx\\base.ts",
+          "src\\jsx\\index.ts"
+        ],
+        [
+          "src\\helper\\streaming\\text.ts",
+          "src\\helper\\streaming\\index.ts"
+        ],
+        [
+          "src\\utils\\jwt\\types.ts",
+          "src\\utils\\jwt\\jws.ts"
+        ]
+      ]
+    }
+  },
+  {
+    "summary": {
+      "repo": "ofetch",
+      "scannedFiles": 19,
+      "frameworks": [],
+      "entries": 13,
+      "dead": 0,
+      "deadByConfidence": {
+        "high": 0,
+        "medium": 0,
+        "low": 0
+      },
+      "unusedDeps": 0,
+      "cycles": 0,
+      "topDead": []
+    },
+    "full": {
+      "meta": {
+        "tool": "agent-refactor",
+        "version": "0.2.0",
+        "scannedAt": "2026-11-12T01:50:20.384Z",
+        "root": "C:\\Users\\25670\\Desktop\\dsh-clean\\projects\\agent-refactor\\tmp\\corpus\\ofetch",
+        "scannedFiles": 19,
+        "frameworks": [],
+        "entryFiles": [
+          "eslint.config.mjs",
+          "examples/body.mjs",
+          "examples/error-handling.mjs",
+          "examples/first-request.mjs",
+          "examples/headers.mjs",
+          "examples/methods.mjs",
+          "examples/proxy.mjs",
+          "examples/query-string.mjs",
+          "examples/type-safety.ts",
+          "src/index.ts",
+          "test/index.test.ts",
+          "test/playground.ts",
+          "vitest.config.ts"
+        ],
+        "generatedFiles": 0,
+        "deadByConfidence": {
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "hasPackage": true
+      },
+      "deadFiles": [],
+      "unusedDeps": [],
+      "toolchainDeps": [
+        {
+          "name": "@types/node",
+          "workspace": null,
+          "note": "工具链依赖，通常不删"
+        },
+        {
+          "name": "automd",
+          "workspace": null,
+          "note": "工具链依赖，通常不删"
+        },
+        {
+          "name": "typescript",
+          "workspace": null,
+          "note": "工具链依赖，通常不删"
+        }
+      ],
+      "cycles": []
+    }
+  },
+  {
+    "summary": {
+      "repo": "pinia",
+      "scannedFiles": 168,
+      "frameworks": [
+        "nuxt",
+        "vitepress"
+      ],
+      "entries": 123,
+      "dead": 10,
+      "deadByConfidence": {
+        "high": 2,
+        "medium": 7,
+        "low": 1
+      },
+      "unusedDeps": 4,
+      "cycles": 1,
+      "topDead": [
+        "high:packages/size-check/src/pinia.js",
+        "high:scripts/verifyCommit.mjs",
+        "medium:packages/nuxt/src/runtime/composables.ts",
+        "medium:packages/nuxt/src/runtime/payload-plugin.ts",
+        "medium:packages/nuxt/src/runtime/plugin.ts",
+        "medium:packages/online-playground/shims-vue.d.ts",
+        "medium:packages/online-playground/src/pinia-dev-proxy.ts",
+        "medium:packages/online-playground/src/vue-dev-proxy.ts"
+      ]
+    },
+    "full": {
+      "meta": {
+        "tool": "agent-refactor",
+        "version": "0.2.0",
+        "scannedAt": "2026-11-12T01:50:20.557Z",
+        "root": "C:\\Users\\25670\\Desktop\\dsh-clean\\projects\\agent-refactor\\tmp\\corpus\\pinia",
+        "scannedFiles": 168,
+        "frameworks": [
+          "nuxt",
+          "vitepress"
+        ],
+        "entryFiles": [
+          "packages/docs/.vitepress/config/en.ts",
+          "packages/docs/.vitepress/config/index.ts",
+          "packages/docs/.vitepress/config/shared.ts",
+          "packages/docs/.vitepress/config/zh.ts",
+          "packages/docs/.vitepress/theme/components/AsideSponsors.vue",
+          "packages/docs/.vitepress/theme/components/HomeSponsors.vue",
+          "packages/docs/.vitepress/theme/components/HomeSponsorsGroup.vue",
+          "packages/docs/.vitepress/theme/components/MadVueBanner.vue",
+          "packages/docs/.vitepress/theme/components/MasteringPiniaLink.vue",
+          "packages/docs/.vitepress/theme/components/PiniaLogo.vue",
+          "packages/docs/.vitepress/theme/components/RuleKitLink.vue",
+          "packages/docs/.vitepress/theme/components/VueMasteryBanner.vue",
+          "packages/docs/.vitepress/theme/components/VueMasteryHomeLink.vue",
+          "packages/docs/.vitepress/theme/components/VueMasteryLogoLink.vue",
+          "packages/docs/.vitepress/theme/components/VueSchoolLink.vue",
+          "packages/docs/.vitepress/theme/components/VuejsdeConfBanner.vue",
+          "packages/docs/.vitepress/theme/index.ts",
+          "packages/docs/run-typedoc.mjs",
+          "packages/docs/vite.config.ts",
+          "packages/nuxt/playground/app.vue",
+          "packages/nuxt/playground/domain/one/stores/testStore.ts",
+          "packages/nuxt/playground/fake-main.js",
+          "packages/nuxt/playground/layers/layer-domain/nuxt.config.ts",
+          "packages/nuxt/playground/layers/layer-domain/stores/basic.ts",
+          "packages/nuxt/playground/nuxt.config.ts",
+          "packages/nuxt/playground/pages/index.vue",
+          "packages/nuxt/playground/pages/skip-hydrate.vue",
+          "packages/nuxt/playground/stores/counter.ts",
+          "packages/nuxt/playground/stores/nested/some-store.ts",
+          "packages/nuxt/playground/stores/with-skip-hydrate.ts",
+          "packages/nuxt/src/module.ts",
+          "packages/nuxt/test/auto-hmr-plugin.spec.ts",
+          "packages/nuxt/test/fixtures/layers-default/app/stores/counter.ts",
+          "packages/nuxt/test/fixtures/layers-default/layers/test/app/stores/settings.ts",
+          "packages/nuxt/test/fixtures/layers-default/layers/test/nuxt.config.ts",
+          "packages/nuxt/test/fixtures/layers-default/nuxt.config.ts",
+          "packages/nuxt/test/layers.spec.ts",
+          "packages/nuxt/test/nuxt.spec.ts",
+          "packages/online-playground/src/App.vue",
+          "packages/online-playground/src/download/template/main.js",
+          "packages/online-playground/src/download/template/vite.config.js",
+          "packages/online-playground/src/main.ts",
+          "packages/online-playground/vite.config.ts",
+          "packages/pinia/__tests__/actions.spec.ts",
+          "packages/pinia/__tests__/combinedStores.spec.ts",
+          "packages/pinia/__tests__/devtools.spec.ts",
+          "packages/pinia/__tests__/dist-import.mjs",
+          "packages/pinia/__tests__/getters.spec.ts",
+          "packages/pinia/__tests__/hmr.spec.ts",
+          "packages/pinia/__tests__/lifespan.spec.ts",
+          "packages/pinia/__tests__/mapHelpers.spec.ts",
+          "packages/pinia/__tests__/onAction.spec.ts",
+          "packages/pinia/__tests__/pinia/stores/cart.ts",
+          "packages/pinia/__tests__/pinia/stores/combined.ts",
+          "packages/pinia/__tests__/pinia/stores/user.ts",
+          "packages/pinia/__tests__/rootState.spec.ts",
+          "packages/pinia/__tests__/ssr.spec.ts",
+          "packages/pinia/__tests__/state.spec.ts",
+          "packages/pinia/__tests__/store.patch.spec.ts",
+          "packages/pinia/__tests__/store.spec.ts",
+          "packages/pinia/__tests__/storePlugins.spec.ts",
+          "packages/pinia/__tests__/storeSetup.spec.ts",
+          "packages/pinia/__tests__/storeToRefs.spec.ts",
+          "packages/pinia/__tests__/subscriptions.spec.ts",
+          "packages/pinia/__tests__/vitest-mock-warn.ts",
+          "packages/pinia/__tests__/vitest-setup.ts",
+          "packages/pinia/src/index.ts",
+          "packages/pinia/test-dts/actions.test-d.ts",
+          "packages/pinia/test-dts/customizations.test-d.ts",
+          "packages/pinia/test-dts/index.d.ts",
+          "packages/pinia/test-dts/mapHelpers.test-d.ts",
+          "packages/pinia/test-dts/onAction.test-d.ts",
+          "packages/pinia/test-dts/plugins.test-d.ts",
+          "packages/pinia/test-dts/state.test-d.ts",
+          "packages/pinia/test-dts/store.test-d.ts",
+          "packages/pinia/test-dts/storeSetup.test-d.ts",
+          "packages/pinia/test-dts/storeToRefs.test-d.ts",
+          "packages/pinia/test-dts/subscribe.test-d.ts",
+          "packages/pinia/test-dts/typeHelpers.test-d.ts",
+          "packages/pinia/tsdown.config.ts",
+          "packages/playground/src/App.vue",
+          "packages/playground/src/api/jokes.ts",
+          "packages/playground/src/api/nasa.ts",
+          "packages/playground/src/composables/useCachedRequest.ts",
+          "packages/playground/src/main.ts",
+          "packages/playground/src/router.ts",
+          "packages/playground/src/shims-vue.d.ts",
+          "packages/playground/src/stores/cart.ts",
+          "packages/playground/src/stores/counter.ts",
+          "packages/playground/src/stores/counterSetup.ts",
+          "packages/playground/src/stores/demo-counter.ts",
+          "packages/playground/src/stores/jokes-swrv.ts",
+          "packages/playground/src/stores/jokes.ts",
+          "packages/playground/src/stores/jokesUsePromised.ts",
+          "packages/playground/src/stores/nasa-pod.ts",
+          "packages/playground/src/stores/nasa.ts",
+          "packages/playground/src/stores/user.ts",
+          "packages/playground/src/stores/wholeStore.ts",
+          "packages/playground/src/test.ts",
+          "packages/playground/src/views/404.vue",
+          "packages/playground/src/views/About.vue",
+          "packages/playground/src/views/AllStores.vue",
+          "packages/playground/src/views/AllStoresDispose.vue",
+          "packages/playground/src/views/CounterSetupStore.vue",
+          "packages/playground/src/views/CounterStore.vue",
+          "packages/playground/src/views/DemoCounter.vue",
+          "packages/playground/src/views/Jokes.vue",
+          "packages/playground/src/views/JokesPromised.vue",
+          "packages/playground/src/views/NasaPOD.vue",
+          "packages/playground/src/views/NasaPODSwrv.vue",
+          "packages/playground/src/views/swrv.vue",
+          "packages/playground/src/vite-env.d.ts",
+          "packages/playground/vite.config.ts",
+          "packages/size-check/rollup.config.mjs",
+          "packages/size-check/scripts/check-size.mjs",
+          "packages/testing/src/index.ts",
+          "packages/testing/src/initialState.spec.ts",
+          "packages/testing/src/mocked-store.spec.ts",
+          "packages/testing/src/restoreGetters.spec.ts",
+          "packages/testing/src/testing.spec.ts",
+          "packages/testing/tsdown.config.ts",
+          "scripts/release.ts",
+          "vitest.config.ts"
+        ],
+        "generatedFiles": 0,
+        "deadByConfidence": {
+          "high": 2,
+          "medium": 7,
+          "low": 1
+        },
+        "hasPackage": true
+      },
+      "deadFiles": [
+        {
+          "file": "packages/size-check/src/pinia.js",
+          "confidence": "high",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 168 个源文件",
+            "0 处 import/require 引用它",
+            "从 123 个显式入口出发不可达"
+          ],
+          "chain": [
+            "没有任何文件引用它"
+          ]
+        },
+        {
+          "file": "scripts/verifyCommit.mjs",
+          "confidence": "high",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 168 个源文件",
+            "0 处 import/require 引用它",
+            "从 123 个显式入口出发不可达"
+          ],
+          "chain": [
+            "没有任何文件引用它"
+          ]
+        },
+        {
+          "file": "packages/nuxt/src/runtime/composables.ts",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 168 个源文件",
+            "0 处 import/require 引用它",
+            "从 123 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "packages/nuxt/src/runtime/payload-plugin.ts",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 168 个源文件",
+            "0 处 import/require 引用它",
+            "从 123 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "packages/nuxt/src/runtime/plugin.ts",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 168 个源文件",
+            "0 处 import/require 引用它",
+            "从 123 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：框架约定加载"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "packages/online-playground/shims-vue.d.ts",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 168 个源文件",
+            "0 处 import/require 引用它",
+            "从 123 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：类型声明文件（.d.ts），无法从引用图证明未使用"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "packages/online-playground/src/pinia-dev-proxy.ts",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 168 个源文件",
+            "0 处 import/require 引用它",
+            "从 123 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：packages\\online-playground\\src\\App.vue 中的路径字符串"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "packages/online-playground/src/vue-dev-proxy.ts",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 168 个源文件",
+            "0 处 import/require 引用它",
+            "从 123 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：packages\\online-playground\\src\\App.vue 中的路径字符串"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "packages/online-playground/src/vue-server-renderer-dev-proxy.ts",
+          "confidence": "medium",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 168 个源文件",
+            "0 处 import/require 引用它",
+            "从 123 个显式入口出发不可达",
+            "仅有字符串/配置/约定证据：packages\\online-playground\\src\\App.vue 中的路径字符串"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        },
+        {
+          "file": "packages/nuxt/shims.d.ts",
+          "confidence": "low",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 168 个源文件",
+            "0 处 import/require 引用它",
+            "从 123 个显式入口出发不可达",
+            "仅被不可达文件或注释提及：packages\\nuxt\\tsconfig.json 中的路径提及"
+          ],
+          "chain": [
+            "仅有字符串/约定层面的引用痕迹"
+          ]
+        }
+      ],
+      "unusedDeps": [
+        {
+          "name": "conventional-changelog-angular",
+          "workspace": null,
+          "evidence": "扫描 168 个源文件，全仓库无 import/require 命中"
+        },
+        {
+          "name": "pascalcase",
+          "workspace": null,
+          "evidence": "扫描 168 个源文件，全仓库无 import/require 命中"
+        },
+        {
+          "name": "@chenfengyuan/vue-countdown",
+          "workspace": "packages/docs",
+          "evidence": "扫描 168 个源文件（声明于 workspace packages/docs），全仓库无 import/require 命中"
+        },
+        {
+          "name": "typedoc-vitepress-theme",
+          "workspace": "packages/docs",
+          "evidence": "扫描 168 个源文件（声明于 workspace packages/docs），全仓库无 import/require 命中"
+        }
+      ],
+      "toolchainDeps": [
+        {
+          "name": "@types/lodash.kebabcase",
+          "workspace": null,
+          "note": "工具链依赖，通常不删"
+        },
+        {
+          "name": "@types/node",
+          "workspace": null,
+          "note": "工具链依赖，通常不删"
+        },
+        {
+          "name": "@vue/compiler-sfc",
+          "workspace": null,
+          "note": "工具链依赖，通常不删"
+        },
+        {
+          "name": "lint-staged",
+          "workspace": null,
+          "note": "工具链依赖，通常不删"
+        },
+        {
+          "name": "rimraf",
+          "workspace": null,
+          "note": "工具链依赖，通常不删"
+        },
+        {
+          "name": "typescript",
+          "workspace": null,
+          "note": "工具链依赖，通常不删"
+        },
+        {
+          "name": "typescript",
+          "workspace": "packages/nuxt",
+          "note": "工具链依赖，通常不删"
+        }
+      ],
+      "cycles": [
+        [
+          "packages\\pinia\\src\\types.ts",
+          "packages\\pinia\\src\\rootStore.ts"
+        ]
+      ]
+    }
+  },
+  {
+    "summary": {
+      "repo": "unplugin-auto-import",
+      "scannedFiles": 114,
+      "frameworks": [
+        "astro"
+      ],
+      "entries": 82,
+      "dead": 1,
+      "deadByConfidence": {
+        "high": 1,
+        "medium": 0,
+        "low": 0
+      },
+      "unusedDeps": 1,
+      "cycles": 1,
+      "topDead": [
+        "high:src/presets/preact-compat.ts"
+      ]
+    },
+    "full": {
+      "meta": {
+        "tool": "agent-refactor",
+        "version": "0.2.0",
+        "scannedAt": "2026-11-12T01:50:20.632Z",
+        "root": "C:\\Users\\25670\\Desktop\\dsh-clean\\projects\\agent-refactor\\tmp\\corpus\\unplugin-auto-import",
+        "scannedFiles": 114,
+        "frameworks": [
+          "astro"
+        ],
+        "entryFiles": [
+          "eslint.config.js",
+          "examples/solid-js/src/App.tsx",
+          "examples/solid-js/src/index.tsx",
+          "examples/solid-js/src/layouts/MainLayout.tsx",
+          "examples/solid-js/src/views/PageA.tsx",
+          "examples/solid-js/src/views/PageB.tsx",
+          "examples/solid-js/vite.config.ts",
+          "examples/vite-astro/astro.config.mjs",
+          "examples/vite-astro/src/components/Card.astro",
+          "examples/vite-astro/src/components/Card.svelte",
+          "examples/vite-astro/src/components/Card.tsx",
+          "examples/vite-astro/src/components/Card.vue",
+          "examples/vite-astro/src/env.d.ts",
+          "examples/vite-astro/src/layouts/Layout.astro",
+          "examples/vite-astro/src/pages/index.astro",
+          "examples/vite-astro/src/utils/contants.ts",
+          "examples/vite-react/src/App.tsx",
+          "examples/vite-react/src/i18n.ts",
+          "examples/vite-react/src/layouts/MainLayout.tsx",
+          "examples/vite-react/src/main.tsx",
+          "examples/vite-react/src/react-i18next.d.ts",
+          "examples/vite-react/src/types/index.ts",
+          "examples/vite-react/src/views/PageA.tsx",
+          "examples/vite-react/src/views/PageB.tsx",
+          "examples/vite-react/src/vite-env.d.ts",
+          "examples/vite-react/vite.config.ts",
+          "examples/vite-svelte/src/App.svelte",
+          "examples/vite-svelte/src/lib/Counter.svelte",
+          "examples/vite-svelte/src/main.ts",
+          "examples/vite-svelte/src/vite-env.d.ts",
+          "examples/vite-svelte/svelte.config.ts",
+          "examples/vite-svelte/vite.config.ts",
+          "playground/App.vue",
+          "playground/HelloWorld.vue",
+          "playground/composables/foo.ts",
+          "playground/composables/nested/bar.ts",
+          "playground/directives/custom-directive.ts",
+          "playground/main.ts",
+          "playground/vite.config.ts",
+          "src/astro.ts",
+          "src/esbuild.ts",
+          "src/index.ts",
+          "src/nuxt.ts",
+          "src/rolldown.ts",
+          "src/rollup.ts",
+          "src/rspack.ts",
+          "src/types.ts",
+          "src/vite.ts",
+          "src/webpack.ts",
+          "test/biomelintrc.test.ts",
+          "test/dts.test.ts",
+          "test/fixtures-vue-macro/existing.ts",
+          "test/fixtures-vue-macro/notexisting.ts",
+          "test/fixtures/comments.ts",
+          "test/fixtures/custom.js",
+          "test/fixtures/dollar.js",
+          "test/fixtures/existing.jsx",
+          "test/fixtures/existing2.jsx",
+          "test/fixtures/existing3.jsx",
+          "test/fixtures/existing4.jsx",
+          "test/fixtures/existing5.jsx",
+          "test/fixtures/existing6.jsx",
+          "test/fixtures/glob.ts",
+          "test/fixtures/import-all.ts",
+          "test/fixtures/non-target.js",
+          "test/fixtures/props.ts",
+          "test/fixtures/prototype.ts",
+          "test/fixtures/react-existing.jsx",
+          "test/fixtures/react.jsx",
+          "test/fixtures/recursive.ts",
+          "test/fixtures/resolver-element.ts",
+          "test/fixtures/resolver.ts",
+          "test/fixtures/strings.ts",
+          "test/fixtures/svelte.svelte",
+          "test/fixtures/template-literal.ts",
+          "test/fixtures/template-ref.vue",
+          "test/fixtures/vue.js",
+          "test/search.test.ts",
+          "test/tmp/dts.increase.d.ts",
+          "test/transform.test.ts",
+          "tsdown.config.ts",
+          "vitest.config.ts"
+        ],
+        "generatedFiles": 0,
+        "deadByConfidence": {
+          "high": 1,
+          "medium": 0,
+          "low": 0
+        },
+        "hasPackage": true
+      },
+      "deadFiles": [
+        {
+          "file": "src/presets/preact-compat.ts",
+          "confidence": "high",
+          "inbound": 0,
+          "refs": [],
+          "evidence": [
+            "扫描 114 个源文件",
+            "0 处 import/require 引用它",
+            "从 82 个显式入口出发不可达"
+          ],
+          "chain": [
+            "没有任何文件引用它"
+          ]
+        }
+      ],
+      "unusedDeps": [
+        {
+          "name": "@svgr/plugin-jsx",
+          "workspace": null,
+          "evidence": "扫描 114 个源文件，全仓库无 import/require 命中"
+        }
+      ],
+      "toolchainDeps": [
+        {
+          "name": "@types/node",
+          "workspace": null,
+          "note": "工具链依赖，通常不删"
+        },
+        {
+          "name": "@types/picomatch",
+          "workspace": null,
+          "note": "工具链依赖，通常不删"
+        },
+        {
+          "name": "publint",
+          "workspace": null,
+          "note": "工具链依赖，通常不删"
+        },
+        {
+          "name": "typescript",
+          "workspace": null,
+          "note": "工具链依赖，通常不删"
+        }
+      ],
+      "cycles": [
+        [
+          "src\\presets\\vuex.ts",
+          "src\\presets\\vueuse-math.ts",
+          "src\\presets\\vueuse-head.ts",
+          "src\\presets\\vueuse-core.ts",
+          "src\\presets\\vue-router-composables.ts",
+          "src\\presets\\vue-router.ts",
+          "src\\presets\\vitepress.ts",
+          "src\\presets\\vee-validate.ts",
+          "src\\presets\\uni-app.ts",
+          "src\\presets\\svelte.ts",
+          "src\\presets\\solid-router.ts",
+          "src\\presets\\solid-app-router.ts",
+          "src\\presets\\solid.ts",
+          "src\\presets\\recoil.ts",
+          "src\\presets\\react-router-dom.ts",
+          "src\\presets\\react-router.ts",
+          "src\\presets\\react-i18next.ts",
+          "src\\presets\\react-dom.ts",
+          "src\\presets\\react.ts",
+          "src\\presets\\quasar.ts",
+          "src\\presets\\preact.ts",
+          "src\\presets\\mobx-react-lite.ts",
+          "src\\presets\\mobx.ts",
+          "src\\presets\\jotai.ts",
+          "src\\presets\\ahooks.ts",
+          "src\\presets\\index.ts",
+          "src\\types.ts"
+        ]
+      ]
+    }
+  }
+]

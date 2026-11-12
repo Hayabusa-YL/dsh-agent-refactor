@@ -85,7 +85,14 @@ function llmFor(generated) {
       const sys = messages[0].content;
       if (sys.includes('输出语义地图')) return JSON.stringify(analysis);
       if (sys.includes('拆成 3-5 个子组件')) return JSON.stringify(plan);
-      if (sys.includes('按拆分计划生成完整代码')) return JSON.stringify(generated);
+      if (sys.includes('生成其中一个文件')) {
+        const user = messages[1]?.content || '';
+        const matched = user.match(/"file": "([^"]+)"/);
+        const path = matched ? matched[1] : '';
+        const hit = generated.files.find((f) => f.path === path);
+        return JSON.stringify({ path, content: hit ? hit.content : 'export function X() { return null; }\n' });
+      }
+      if (sys.includes('改造成父组件')) return JSON.stringify(generated.parent);
       throw new Error('unexpected prompt: ' + sys.slice(0, 40));
     },
   };

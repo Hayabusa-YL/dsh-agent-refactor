@@ -86,7 +86,7 @@ export async function planSplit(llm, code, analysis, meta = {}) {
       { role: 'system', content: meta.kind === 'vue' ? VUE_PLAN_SYSTEM : PLAN_SYSTEM },
       {
         role: 'user',
-        content: `组件路径：${meta.path || 'unknown'}\n\n语义地图：\n${JSON.stringify(analysis, null, 2)}\n\n完整源码：\n${code}`,
+        content: `组件路径：${meta.path || 'unknown'}\n\n语义地图：\n${JSON.stringify(analysis, null, 2)}${meta.planErrors?.length ? `\n\n上一次计划未通过校验：\n${meta.planErrors.map((e) => `- ${e}`).join('\n')}\n请修正这些问题后重新输出完整计划 JSON。` : ''}`,
       },
     ],
     { json: true, maxTokens: 4000 },
@@ -123,34 +123,72 @@ export function validatePlan(plan) {
   return errors;
 }
 
-const GENERATE_SYSTEM = `你是资深 React 工程师。按拆分计划生成完整代码。只输出 JSON：
-{
-  "files": [{ "path": "components/RelativePath.tsx", "content": "完整文件内容" }],
-  "parent": { "path": "原组件相对路径", "content": "改造后的父组件完整内容" }
-}
+const GENERATE_FILE_SYSTEM = `你是资深 React 工程师。按拆分计划生成其中一个文件。只输出 JSON：
+{ "path": "该文件的相对路径", "content": "完整文件内容" }
 规则：
-- files 必须覆盖计划里所有 components 和 hooks 的 file 字段；
-- 每个文件内容完整可编译（含 import/export 与类型）；
-- 原项目是 TypeScript 就用 TS 类型，不引入新依赖；
+- 内容完整可编译（含 import/export 与类型），不引入新依赖；
 - hooks 的 .ts 文件禁止包含 JSX（<大写组件>），需要 JSX 的逻辑请放进 .tsx 组件文件；
-- 父组件改为组合这些子组件和 hooks，保持原 UI 结构与交互行为不变；
-- 如果原型是 .jsx 就用 JSX，不要强行加类型。`;
+- 如果原型是 .jsx 就用 JSX，不要强行加类型。
+只输出 JSON，不要解释。`;
+
+const VUE_GENERATE_FILE_SYSTEM = `你是资深 Vue 3 工程师。按拆分计划生成其中一个文件。只输出 JSON：
+{ "path": "该文件的相对路径", "content": "完整文件内容" }
+规则：
+- 组件文件用 <script setup> + defineProps/defineEmits，内容完整可编译；
+- composable 用 .js/.ts，禁止包含模板或 JSX；
+- 不引入新依赖。
+只输出 JSON，不要解释。`;
+
+const GENERATE_PARENT_SYSTEM = `你是资深 React 工程师。按拆分计划把原组件改造成父组件，组合子组件与 hooks。只输出 JSON：
+{ "path": "原组件相对路径", "content": "改造后的父组件完整内容" }
+规则：
+- 保持原 UI 结构与交互行为不变，不引入新依赖；
+- 如果原型是 .jsx 就用 JSX；只输出 JSON，不要解释。`;
+
+const VUE_GENERATE_PARENT_SYSTEM = `你是资深 Vue 3 工程师。按拆分计划把原组件改造成父组件，组合子组件与 composables。只输出 JSON：
+{ "path": "原组件相对路径.vue", "content": "改造后的父组件完整内容" }
+规则：
+- 保持原模板与行为不变，所有组件文件一律 .vue，不引入新依赖；
+- 只输出 JSON，不要解释。`;
 
 export async function generateComponents(llm, code, plan, meta = {}) {
-  const feedback = Array.isArray(meta.safetyIssues) && meta.safetyIssues.length
-    ? `\n\n上一次生成的代码被静态安全审查拦截，必须避免以下问题后重新生成全部文件：\n${meta.safetyIssues.map((b) => `- ${b.file}: ${b.message}`).join('\n')}`
-    : '';
-  const content = await llm.chat(
+  const problems = [
+    ...(Array.isArray(meta.safetyIssues) && meta.safetyIssues.length
+      ? ['上一次生成的代码被静态安全审查拦截，必须避免以下问题后重新生成全部文件：', ...meta.safetyIssues.map((b) => `- ${b.file}: ${b.message}`)]
+      : []),
+    ...(Array.isArray(meta.generateErrors) && meta.generateErrors.length
+      ? ['上一次生成结果未通过校验，必须修正以下问题后重新生成全部文件：', ...meta.generateErrors.map((e) => `- ${e}`)]
+      : []),
+  ];
+  const feedback = problems.length ? `\n\n${problems.join('\n')}` : '';
+  const units = [...(plan.components || []), ...(plan.hooks || [])];
+  const files = [];
+  for (const unit of units) {
+    const content = await llm.chat(
+      [
+        { role: 'system', content: meta.kind === 'vue' ? VUE_GENERATE_FILE_SYSTEM : GENERATE_FILE_SYSTEM },
+        {
+          role: 'user',
+          content: `原组件路径：${meta.path || 'unknown'}\n\n本次要生成的文件（拆分计划条目）：\n${JSON.stringify(unit, null, 2)}\n\n完整源码：\n${code}${feedback}`,
+        },
+      ],
+      { json: true, maxTokens: 3000 },
+    );
+    const parsed = parseJsonLoose(content);
+    files.push({ path: parsed.path || unit.file, content: parsed.content });
+  }
+  const parentContent = await llm.chat(
     [
-      { role: 'system', content: meta.kind === 'vue' ? VUE_GENERATE_SYSTEM : GENERATE_SYSTEM },
+      { role: 'system', content: meta.kind === 'vue' ? VUE_GENERATE_PARENT_SYSTEM : GENERATE_PARENT_SYSTEM },
       {
         role: 'user',
         content: `原组件路径：${meta.path || 'unknown'}\n\n拆分计划：\n${JSON.stringify(plan, null, 2)}\n\n完整源码：\n${code}${feedback}`,
       },
     ],
-    { json: true, maxTokens: 8000 },
+    { json: true, maxTokens: 3000 },
   );
-  return parseJsonLoose(content);
+  const parent = parseJsonLoose(parentContent);
+  return { files, parent: { path: parent.path || meta.path, content: parent.content } };
 }
 
 /** 生成结果校验：计划里的每个文件都要被生成，且内容非空 */

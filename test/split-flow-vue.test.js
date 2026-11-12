@@ -76,7 +76,14 @@ function mockLlm() {
       const system = messages[0].content;
       if (system.includes('语义地图')) return JSON.stringify(ANALYSIS);
       if (system.includes('拆成 3-5 个子组件')) return JSON.stringify(PLAN);
-      if (system.includes('按拆分计划生成完整代码')) return JSON.stringify(GENERATED);
+      if (system.includes('生成其中一个文件')) {
+        const user = messages[1]?.content || '';
+        const matched = user.match(/"file": "([^"]+)"/);
+        const path = matched ? matched[1] : '';
+        const hit = GENERATED.files.find((f) => f.path === path);
+        return JSON.stringify({ path, content: hit ? hit.content : 'export function X() { return null; }\n' });
+      }
+      if (system.includes('改造成父组件')) return JSON.stringify(GENERATED.parent);
       throw new Error('unexpected system prompt');
     },
   };

@@ -30,17 +30,25 @@ export async function splitComponent({ root, componentRel, llm, dryRun = false, 
   }
 
   const analysis = await analyzeComponent(llm, code, { path: componentRel, kind: isVue ? 'vue' : undefined });
-  const plan = await planSplit(llm, code, analysis, { path: componentRel, kind: isVue ? 'vue' : undefined });
-  const planErrors = validatePlan(plan);
-  if (planErrors.length) return { ok: false, stage: 'plan', plan, analysis, errors: planErrors };
+  let plan = await planSplit(llm, code, analysis, { path: componentRel, kind: isVue ? 'vue' : undefined });
+  let planErrors = validatePlan(plan);
+  if (planErrors.length) {
+    plan = await planSplit(llm, code, analysis, { path: componentRel, kind: isVue ? 'vue' : undefined, planErrors });
+    planErrors = validatePlan(plan);
+    if (planErrors.length) return { ok: false, stage: 'plan', plan, analysis, errors: planErrors };
+  }
 
   if (dryRun) return { ok: true, dryRun: true, plan, analysis, lines };
 
   if (!yes) return { ok: false, stage: 'confirm', plan, analysis, lines, message: '计划已生成，加 --yes 确认生成代码' };
 
   let generated = await generateComponents(llm, code, plan, { path: componentRel, kind: isVue ? 'vue' : undefined });
-  const genErrors = validateGenerated(generated, plan);
-  if (genErrors.length) return { ok: false, stage: 'generate', plan, errors: genErrors };
+  let genErrors = validateGenerated(generated, plan);
+  if (genErrors.length) {
+    generated = await generateComponents(llm, code, plan, { path: componentRel, kind: isVue ? 'vue' : undefined, generateErrors: genErrors });
+    genErrors = validateGenerated(generated, plan);
+    if (genErrors.length) return { ok: false, stage: 'generate', plan, errors: genErrors };
+  }
 
   // 静态安全审查：红线命中回喂一次，重生成仍命中则拒绝落盘
   let safety = scanGeneratedSafety(generated);
