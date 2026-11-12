@@ -30,3 +30,5 @@ jobs:
 
       - name: Publish to npm
         run: npm publish --access public --registry https://registry.npmjs.org
+        env:
+          NODE_AUTH_TOKEN: ""
