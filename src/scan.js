@@ -8,14 +8,14 @@ const IGNORE_DIRS = new Set([
 // 框架生成的目录：内容由框架按约定加载，不能当成死代码来源
 const GENERATED_DIR_RE = /(^|[\\/])\.(umi|umi-production|umi-test|next|nuxt|svelte-kit|output)([\\/]|$)/i;
 
-const CODE_EXTS = new Set(['.js', '.mjs', '.cjs', '.jsx', '.ts', '.tsx', '.vue', '.astro', '.svelte']);
+const CODE_EXTS = new Set(['.js', '.mjs', '.cjs', '.mts', '.cts', '.jsx', '.ts', '.tsx', '.vue', '.astro', '.svelte']);
 
 // 模块解析候选：TS 先于 JS，最后补 .d.ts（`import type ... from '../data'`）
 const RESOLVE_EXTS = [
-  '.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.json', '.vue', '.astro', '.svelte',
+  '.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.mts', '.cts', '.json', '.vue', '.astro', '.svelte',
   '.d.ts', '.d.mts', '.d.cts',
 ];
-const INDEX_EXTS = ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.vue', '.astro', '.svelte', '.d.ts'];
+const INDEX_EXTS = ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.mts', '.cts', '.vue', '.astro', '.svelte', '.d.ts'];
 
 const CONFIG_FILE_RE = /(^|[\\/])((vite|webpack|next|umi|rollup|rspack|vue|svelte|astro|nuxt|vitest|jest|playwright|babel|tailwind|postcss|commitlint|biome|eslint|storybook|tsdown|tsup|unbuild|rslib|unocss)\.config\.[cm]?[jt]s|\.umirc\.[cm]?[jt]s|config[\\/]config\.[cm]?[jt]s)$/i;
 const RC_CONFIG_RE = /(^|[\\/])\.[\w-]+rc\.[cm]?[jt]s$/i;
@@ -31,6 +31,7 @@ const TOOLCHAIN = new Set([
   'ts-node', 'lint-staged', 'husky', 'nodemon', 'cross-env', 'concurrently',
   'webpack-cli', 'rollup-plugin', '@vue/compiler-sfc', 'vue-tsc',
   'rimraf', 'patch-package', 'publint', 'automd',
+  '@typescript/native-preview', 'bun-types', 'conventional-changelog-angular',
 ]);
 
 // 脚本里常见的 CLI 别名 → 真正提供它的包（脚本里叫 nr，包叫 @antfu/ni）
@@ -43,6 +44,7 @@ const SCRIPT_BIN_PKGS = {
   'run-s': 'npm-run-all2',
   'npm-run-all': 'npm-run-all2',
   tsgo: '@typescript/native-preview',
+  'nuxt-module-build': '@nuxt/module-builder',
 };
 
 const BUILTINS = new Set([
@@ -249,7 +251,8 @@ function isConfigFile(file, root) {
 function isTestFile(file, root) {
   const rel = relative(root, file).replace(/\\/g, '/');
   return /\.(test|spec)\.(js|ts|jsx|tsx|mjs|cjs)$/.test(rel)
-    || /(^|\/)(test|tests|__tests__|e2e)\//.test(rel);
+    || /\.(test|spec)-d\.[cm]?ts$/.test(rel)
+    || /(^|\/)(test|tests|__tests__|e2e|test-dts|type-tests|tests-dts)\//.test(rel);
 }
 
 function candidatePaths(base) {
@@ -461,6 +464,10 @@ export async function scanProject(rootDir) {
       for (const script of Object.values(j.scripts || {})) {
         for (const token of scriptEntry(script)) addEntryFrom(pr.dir, token);
       }
+      // git 钩子（simple-git-hooks）调用的脚本也是入口
+      for (const hook of Object.values(j['simple-git-hooks'] || {})) {
+        for (const token of scriptEntry(String(hook))) addEntryFrom(pr.dir, token);
+      }
     }
     addEntryNames(pr.dir);
     const srcDir = join(pr.dir, 'src');
@@ -586,6 +593,8 @@ export async function scanProject(rootDir) {
     for (const f of files) {
       const rel = relOf(f);
       if (/^(app|error)\.vue$/.test(rel) || /^nuxt\.config\.[cm]?[jt]s$/.test(rel)) addEntry(f);
+      // Nuxt 模块的 runtime 目录由 addPlugin(resolve(runtimeDir, ...)) 按约定加载
+      if (/(^|\/)runtime\//.test(rel) && /\.(vue|[cm]?[jt]sx?)$/.test(rel)) addWeak(f, null, 'convention');
       if (/(^|\/)(components|composables|utils)\//.test(rel) && /\.(vue|[cm]?[jt]sx?)$/.test(rel)) {
         addWeak(f, null, 'convention');
       }
@@ -642,10 +651,16 @@ export async function scanProject(rootDir) {
     }
   }
 
+  // VitePress：.vitepress 是文档站配置与主题入口，页面本身按约定加载
+  if (hasDep('vitepress')) {
+    frameworks.push('vitepress');
+    addEntriesUnder('.vitepress', /\.(js|ts|mjs|vue)$/);
+  }
+
   // examples/playground/demo 是给人直接跑的样例（不是死代码）；templates 是复制出去的资源
   for (const f of files) {
     const rel = relOf(f);
-    if (/(^|\/)(examples?|playgrounds?|demos?)\//.test(rel)) addEntry(f);
+    if (/(^|\/)(examples?|playgrounds?|demos?|benchmarks?)\//.test(rel)) addEntry(f);
     else if (/(^|\/)(templates?)\//.test(rel)) addWeak(f, null, 'convention');
   }
 
@@ -703,6 +718,14 @@ export async function scanProject(rootDir) {
     const code = fileRead.get(cf) || '';
     for (const m of code.matchAll(/['"`]([^'"`\n]{1,300})['"`]/g)) {
       const token = m[1].trim();
+      // 模板字符串路径（`./src/${name}.js`）按通配展开，不能因为含 ${} 就放弃
+      if (token.includes('${')) {
+        const globToken = token.replace(/\$\{[^}]*\}/g, '*');
+        if (/[*?{[]/.test(globToken)) {
+          for (const hit of expandGlob(globToken, [dirname(cf), root])) edges.get(cf).push(hit);
+        }
+        continue;
+      }
       if (!looksLikePath(token)) continue;
       if (/[*?{[]/.test(token)) {
         // exclude/coverage/ignore 里的 glob 是排除范围，不是使用证据
@@ -802,6 +825,23 @@ export async function scanProject(rootDir) {
     }
   }
 
+  // URL/module 字符串里的路径（playground 用 `${location.origin}/src/x` 加载模块）
+  const urlPathRe = /['"`](?:\$\{[^}]*\})?\.?\/?((?:src|app)\/[A-Za-z0-9_@$.-]+)['"`]/g;
+  for (const [from, code] of evidenceContents) {
+    for (const m of code.matchAll(urlPathRe)) {
+      const token = m[1].replace(/[,;:]+$/, '');
+      if (!token || token.includes('${') || token.length > 120) continue;
+      const bases = [resolve(dirname(from), token)];
+      for (const pr of packageRoots) bases.push(resolve(pr.dir, token));
+      let hit = null;
+      for (const b of bases) {
+        hit = firstExisting([b]);
+        if (hit) break;
+      }
+      if (hit && hit !== from) addWeak(hit, from, 'string');
+    }
+  }
+
   // ---------- 可达性 ----------
   const reachable = new Set();
   const queue = [...seedReachable].filter((e) => fileSet.has(e));
@@ -864,7 +904,12 @@ export async function scanProject(rootDir) {
     if (entries.has(f) || reachable.has(f) || generated.includes(f)) continue;
     const rel = relative(root, f).replace(/\\/g, '/');
     const inbound = incoming.get(f) || 0;
-    const { confidence, notes } = classifyConfidence(f);
+    let { confidence, notes } = classifyConfidence(f);
+    // 类型声明文件（.d.ts）无法用引用图证明未使用：全局声明可被 tsconfig 拽入
+    if (confidence === 'high' && /\.d\.[cm]?ts$/i.test(f)) {
+      confidence = 'medium';
+      notes = ['类型声明文件（.d.ts），无法从引用图证明未使用'];
+    }
     const refs = [...(inboundBy.get(f) || [])].map((r) => ({
       file: relative(root, r),
       reachable: reachable.has(r),
@@ -915,6 +960,7 @@ export async function scanProject(rootDir) {
     for (const s of Object.values(j?.scripts || {})) {
       const str = String(s);
       if (str.includes('--coverage')) configReferenced.add('@vitest/coverage-v8');
+      if (str.includes('--ui')) configReferenced.add('@vitest/ui');
       for (const m of str.matchAll(/[A-Za-z0-9@._/-]+/g)) {
         scriptReferenced.add(toPackageName(m[0]));
         const binPkg = SCRIPT_BIN_PKGS[m[0]];
@@ -922,6 +968,23 @@ export async function scanProject(rootDir) {
       }
     }
   }
+  // CI workflow（.github/workflows/*.yml）里点名的包：pkg-pr-new、发布/预览工具等
+  const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  for (const tf of textFiles) {
+    if (!/\.github[\\/]workflows[\\/][^\\/]+\.ya?ml$/i.test(tf)) continue;
+    let code = '';
+    try {
+      code = await readFile(tf, 'utf8');
+    } catch {
+      continue;
+    }
+    for (const name of depNames) {
+      if (configReferenced.has(name)) continue;
+      const re = new RegExp(`(^|[^\\w@/-])${escapeRe(name)}([^\\w@/-]|$)`);
+      if (re.test(code)) configReferenced.add(name);
+    }
+  }
+
   const unusedDeps = [];
   const toolchainDeps = [];
   const flagged = new Map();
@@ -930,7 +993,10 @@ export async function scanProject(rootDir) {
     if (!pkgJson) continue;
     const pkgRel = pr.dir === root ? null : relative(root, pr.dir).replace(/\\/g, '/');
     // templates/examples/playground 是交付给用户的资源包，仓库自身不 import 它们，不报未用依赖
-    if (pkgRel && /^(?:templates?|examples?|playgrounds?|demos?)(?:\/|$)/.test(pkgRel)) continue;
+    if (pkgRel && /^(?:templates?|examples?|playgrounds?|demos?|benchmarks?)(?:\/|$)/.test(pkgRel)) continue;
+    // 文档站包：依赖常在 md/typedoc 插件配置里使用，静态无法完整覆盖
+    if (pkgRel && /(^|\/)docs?(?:\/|$)/.test(pkgRel)
+      && ((pkgJson.dependencies && pkgJson.dependencies.vitepress) || (pkgJson.devDependencies && pkgJson.devDependencies.vitepress))) continue;
     const declared = { ...(pkgJson.dependencies || {}), ...(pkgJson.devDependencies || {}) };
     for (const name of Object.keys(declared)) {
       if (globalImports.has(name) || globalImports.has(toPackageName(name))) continue;

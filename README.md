@@ -54,15 +54,18 @@
 
 **扫描精度**（2026-11 修复）：入口可达性 + 置信度分级后，real-repo 死代码 108 → 14，旧报告 100 条误报抽检 0 条仍是 high；mini-leads 旧报告 4 条误报全部降级；giant-app 0 条 high。fix 只删 high 置信死文件。
 
-**真实仓库回归语料**（2026-12，三个真实开源仓库 `git clone --depth 1` 后裸跑，可用 `npm run corpus` 复现）：
+**真实仓库回归语料**（2026-12，六个真实开源仓库 `git clone --depth 1` 后裸跑，可用 `npm run corpus` 复现）：
 
 | 仓库 | 扫描文件 | 死代码（high/medium） | 未用依赖 | 说明 |
 | --- | --- | --- | --- | --- |
 | unjs/ofetch | 19 | 0 / 0 | 0 | examples/ 是入口；`--coverage`/`provider` 推断 coverage 包、automd 文档标记不算未用 |
 | vuejs/create-vue | 101 | 0 / 68 | 0 | 68 条全是 template/ 下的模板片段（生成器复制出去的资源），标 medium 不删；模板包依赖不检查 |
 | unplugin/unplugin-auto-import | 114 | 1 / 0 | 1 | 唯一 high 是 `src/presets/preact-compat.ts`，全仓库确实零引用；唯一未用依赖 `@svgr/plugin-jsx` 全仓库零引用，是真·遗留 |
+| honojs/hono | 454 | 0 / 0 | 0 | TS monorepo；`.mts` 全量扫描、benchmarks 是入口、CI workflow 点名的包（pkg-pr-new 等）算用到 |
+| vuejs/pinia | 168 | 0 / 8 | 1 | pnpm monorepo；`.vitepress` 与 nuxt `runtime/` 按约定降级、`*.test-d.ts` 当测试入口、playground 的 URL 字符串引用降 medium；剩 `pascalcase` 是真遗留 |
+| expressjs/express | 140 | 0 / 0 | 1 | 纯 CJS 老仓；`hbs` 只在 examples 里当 view engine，属示例依赖 |
 
-这一轮修掉的现实问题：monorepo 每个包的框架路由目录、Astro/Svelte 文件解析、配置里 `dirs: ['src/views']` 式自动导入目录、`dist/x.mjs` 导出回推 `src/x.ts` 源码入口、tsconfig `extends`/脚本 CLI/配置字符串里的依赖不算未用；templates/examples/playground 包是交付给用户的资源包不做依赖检查；脚本里的 CLI 别名（`nr`→@antfu/ni、`run-p`→npm-run-all2、`tsgo`→native-preview）映射到真实包；vitest coverage 按 `--coverage` 与 `provider` 推断缺的包。
+这一轮修掉的现实问题：monorepo 每个包的框架路由目录、Astro/Svelte 文件解析、配置里 `dirs: ['src/views']` 式自动导入目录、`dist/x.mjs` 导出回推 `src/x.ts` 源码入口、tsconfig `extends`/脚本 CLI/配置字符串里的依赖不算未用；templates/examples/playground/benchmarks 包是交付给用户的资源包不做依赖检查；脚本里的 CLI 别名（`nr`→@antfu/ni、`run-p`→npm-run-all2、`tsgo`→native-preview、`nuxt-module-build`→@nuxt/module-builder）映射到真实包；vitest coverage 按 `--coverage` 与 `provider` 推断缺的包；`.mts/.cts` 全量扫描、VitePress `.vitepress` 入口、Nuxt 模块 `runtime/` 约定、`*.test-d.ts` 类型测试入口、config 模板字符串（`` `./src/${name}.js` ``）按通配展开、`.d.ts` 声明文件不判 high、`simple-git-hooks` 入口、CI workflow 里点名的依赖、`--ui`→@vitest/ui 这几类也都补上了。
 
 **成本**：单组件完整拆分（分析 + 规划 + 生成，共 3 次 LLM 调用）约 2–3 万 token，按 DeepSeek 价格约 **3–5 分钱**；失败回喂修复每轮再加约 3 千 token。样本与记录见 `memory/audit/split-engine-2026-11-15.md`。
 
