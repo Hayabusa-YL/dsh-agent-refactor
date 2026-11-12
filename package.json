@@ -8,7 +8,7 @@
   },
   "main": "src/cli.js",
   "scripts": {
-    "test": "node --test test/scan.test.js test/fix.test.js test/splitter.test.js test/split-flow.test.js test/frameworks.test.js test/regression.test.js",
+    "test": "node --test test/scan.test.js test/fix.test.js test/splitter.test.js test/split-flow.test.js test/frameworks.test.js test/regression.test.js test/split-behavior.test.js",
     "corpus": "node scripts/validate-corpus.mjs"
   },
   "dependencies": {

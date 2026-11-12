@@ -36,6 +36,15 @@ async function hasBin(root, name) {
   return access(bin).then(() => true).catch(() => false);
 }
 
+/** 跨平台跑测试框架入口：Windows 下 `node_modules/.bin/vitest` 这种正斜杠路径 cmd 解析不了，直接走 node 入口。 */
+function frameworkCommand(framework) {
+  return framework === 'jest' ? 'node node_modules/jest/bin/jest.js' : 'node node_modules/vitest/vitest.mjs';
+}
+
+function runnerArgs(framework, testFile) {
+  return framework === 'jest' ? `${testFile} --env=jsdom` : `run ${testFile} --reporter=dot`;
+}
+
 /**
  * 拆分前采集行为基线（原组件渲染出的 HTML）。环境不全时返回 null，后续走静态模式。
  */
@@ -47,9 +56,13 @@ export async function captureBehaviorBaseline(root, componentRel) {
   const baselinePath = join(root, '__ar_baseline.json');
   const testFile = '__ar_capture_baseline.test.tsx';
   const importPath = './' + componentRel.replace(/\\/g, '/');
+  const isJest = env.framework === 'jest';
+  const header = isJest
+    ? ['/** @jest-environment jsdom */']
+    : ['// @vitest-environment jsdom', "import { test } from 'vitest';"];
   const content = [
-    '// @vitest-environment jsdom',
-    "import { test } from 'vitest';",
+    ...header,
+    "import React from 'react';",
     "import { render } from '@testing-library/react';",
     `import * as Mod from '${importPath}';`,
     "import { writeFileSync } from 'node:fs';",
@@ -62,7 +75,7 @@ export async function captureBehaviorBaseline(root, componentRel) {
   ].join('\n');
   await writeFile(join(root, testFile), content, 'utf8');
   try {
-    const run = await runCommand(`node_modules/.bin/${env.framework} run ${testFile} --reporter=dot`, root, cleanEnv());
+    const run = await runCommand(`${frameworkCommand(env.framework)} ${runnerArgs(env.framework, testFile)}`, root, cleanEnv());
     if (!run.ok) return null;
     const parsed = JSON.parse(await readFile(baselinePath, 'utf8'));
     return { html: parsed.html, path: baselinePath };
@@ -128,9 +141,13 @@ async function runStaticRegression(root, componentRel, children) {
 async function runBehaviorRegression(root, componentRel, baseline, framework) {
   const testFile = '__ar_regression.test.tsx';
   const importPath = './' + componentRel.replace(/\\/g, '/');
+  const isJest = framework === 'jest';
+  const header = isJest
+    ? ['/** @jest-environment jsdom */']
+    : ['// @vitest-environment jsdom', "import { test, expect } from 'vitest';"];
   const content = [
-    '// @vitest-environment jsdom',
-    "import { test, expect } from 'vitest';",
+    ...header,
+    "import React from 'react';",
     "import { render } from '@testing-library/react';",
     `import * as Mod from '${importPath}';`,
     "import { readFileSync } from 'node:fs';",
@@ -144,8 +161,8 @@ async function runBehaviorRegression(root, componentRel, baseline, framework) {
   ].join('\n');
   await writeFile(join(root, testFile), content, 'utf8');
   try {
-    const run = await runCommand(`node_modules/.bin/${framework} run ${testFile} --reporter=dot`, root, cleanEnv());
-    return { ok: run.ok, mode: 'behavior', command: `${framework} run ${testFile}`, ms: run.ms, tail: run.tail };
+    const run = await runCommand(`${frameworkCommand(framework)} ${runnerArgs(framework, testFile)}`, root, cleanEnv());
+    return { ok: run.ok, mode: 'behavior', command: `${framework} ${runnerArgs(framework, testFile)}`, ms: run.ms, tail: run.tail };
   } finally {
     await rm(join(root, testFile), { force: true });
   }

@@ -290,6 +290,10 @@ export async function scanProject(rootDir) {
     for (const e of [].concat(json.extends || [])) {
       if (typeof e === 'string' && !e.startsWith('.')) configReferenced.add(toPackageName(e));
     }
+    // tsconfig types 数组点名的类型包（@cloudflare/workers-types 等）
+    for (const t of [].concat(json.compilerOptions?.types || [])) {
+      if (typeof t === 'string' && t) configReferenced.add(toPackageName(t));
+    }
     const paths = json.compilerOptions?.paths;
     if (paths && typeof paths === 'object') {
       for (const [pattern, targets] of Object.entries(paths)) {
@@ -955,17 +959,45 @@ export async function scanProject(rootDir) {
   }
   // 脚本里点名的 CLI（bumpp/eslint/vitest 等）也算工具链使用
   const scriptReferenced = new Set();
+  // node_modules 里已安装依赖的 bin 名 → 包名（biome → @biomejs/biome、max → @umijs/max）
+  const binToPkg = new Map();
+  for (const name of depNames) {
+    try {
+      const pj = JSON.parse(await readFile(join(root, 'node_modules', name, 'package.json'), 'utf8'));
+      if (typeof pj.bin === 'string') binToPkg.set(name.split('/').pop(), name);
+      else if (pj.bin && typeof pj.bin === 'object') {
+        for (const bin of Object.keys(pj.bin)) binToPkg.set(bin, name);
+      }
+    } catch {
+      /* 依赖未安装，跳过 bin 映射 */
+    }
+  }
+  const scriptTexts = [];
   for (const pr of packageRoots) {
     const j = pr.dir === root ? rootPkg : pr.json;
-    for (const s of Object.values(j?.scripts || {})) {
-      const str = String(s);
-      if (str.includes('--coverage')) configReferenced.add('@vitest/coverage-v8');
-      if (str.includes('--ui')) configReferenced.add('@vitest/ui');
-      for (const m of str.matchAll(/[A-Za-z0-9@._/-]+/g)) {
-        scriptReferenced.add(toPackageName(m[0]));
-        const binPkg = SCRIPT_BIN_PKGS[m[0]];
-        if (binPkg) scriptReferenced.add(binPkg);
+    for (const s of Object.values(j?.scripts || {})) scriptTexts.push(String(s));
+  }
+  // husky hooks（.husky/commit-msg 里的 commitlint 也算使用）
+  try {
+    const huskyDir = join(root, '.husky');
+    for (const entry of await readdir(huskyDir, { withFileTypes: true })) {
+      if (!entry.isFile()) continue;
+      try {
+        scriptTexts.push(await readFile(join(huskyDir, entry.name), 'utf8'));
+      } catch {
+        /* ignore */
       }
+    }
+  } catch {
+    /* 无 .husky 目录 */
+  }
+  for (const str of scriptTexts) {
+    if (str.includes('--coverage')) configReferenced.add('@vitest/coverage-v8');
+    if (str.includes('--ui')) configReferenced.add('@vitest/ui');
+    for (const m of str.matchAll(/[A-Za-z0-9@._/-]+/g)) {
+      scriptReferenced.add(toPackageName(m[0]));
+      const binPkg = SCRIPT_BIN_PKGS[m[0]] || binToPkg.get(m[0]);
+      if (binPkg) scriptReferenced.add(binPkg);
     }
   }
   // CI workflow（.github/workflows/*.yml）里点名的包：pkg-pr-new、发布/预览工具等
@@ -1000,6 +1032,8 @@ export async function scanProject(rootDir) {
     const declared = { ...(pkgJson.dependencies || {}), ...(pkgJson.devDependencies || {}) };
     for (const name of Object.keys(declared)) {
       if (globalImports.has(name) || globalImports.has(toPackageName(name))) continue;
+      // React 项目的 react-dom 是框架渲染层运行时：声明了 react 即视为使用
+      if (name === 'react-dom' && declared.react) continue;
       if (configReferenced.has(name) || configReferenced.has(toPackageName(name))) continue;
       if (scriptReferenced.has(name) || scriptReferenced.has(toPackageName(name))) continue;
       if (TOOLCHAIN.has(name) || /^@types\/|^@babel\//.test(name) || /^@([\w-]+)\/eslint/.test(name) || name.includes('eslint')) {
