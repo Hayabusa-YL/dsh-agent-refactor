@@ -3,8 +3,9 @@ const { execFile } = require('node:child_process');
 const { join } = require('node:path');
 
 function plainMessage(d) {
-  const reason = d.reason || d.message || '没有被任何入口引用';
-  return `死代码（${d.confidence || 'unknown'}）：${reason}`;
+  const conf = d.confidence || 'unknown';
+  const ev = Array.isArray(d.evidence) && d.evidence.length ? d.evidence.join('；') : '没有被任何入口引用';
+  return `死代码（${conf}）：${ev}`;
 }
 
 async function scanWorkspace() {

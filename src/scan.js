@@ -91,8 +91,29 @@ function extractSpecifiers(code, file) {
   return [...specs];
 }
 
+// 动态 import/require 的非字面量参数（模板字符串或表达式）：静态分析无法解析，单独暴露
+function extractDynamicImports(code) {
+  const src = String(code || '');
+  const out = new Set();
+  for (const m of src.matchAll(/(?:import|require)\s*\(\s*`([^`]*)`/g)) {
+    out.add('`' + m[1] + '`');
+  }
+  for (const m of src.matchAll(/(?:import|require)\s*\(\s*(?!['"`])([^)]{1,200})\)/g)) {
+    out.add(m[1].trim());
+  }
+  return [...out];
+}
+
 function stripQuery(spec) {
   return spec.split('?')[0].split('#')[0];
+}
+
+// 动态模板 import 的相对路径表达式 → 相对 root 的 glob（如 `./pages/${name}.ts` → pages/*.ts）
+function dynamicTemplateToGlob(fromFile, expr, root) {
+  const raw = String(expr).replace(/^`|`$/g, '');
+  if (!raw.startsWith('.')) return null;
+  const pattern = join(dirname(fromFile), raw.replace(/\$\{[^}]*\}/g, '*'));
+  return relative(root, pattern).replace(/\\/g, '/');
 }
 
 function toPackageName(spec) {
@@ -279,6 +300,8 @@ export async function scanProject(rootDir) {
     ignoredDirs: 0,
     skippedFiles: 0,
     unresolvedRelativeImports: 0,
+    unresolvedImportItems: [],
+    dynamicImportsItems: [],
   };
   await walk(root, state);
   state.files.sort();
@@ -723,12 +746,16 @@ export async function scanProject(rootDir) {
     fileRead.set(f, code);
     const specs = extractSpecifiers(code, f);
     specsAt.set(f, specs);
+    for (const expr of extractDynamicImports(code)) {
+      if (state.dynamicImportsItems.length < 100) state.dynamicImportsItems.push({ file: f, expr });
+    }
     const deps = new Set();
     for (const spec of specs) {
       const hit = resolveSpec(f, spec);
       if (hit) deps.add(hit);
       else if (spec.startsWith('.') || spec.startsWith('@/') || spec.startsWith('~')) {
         state.unresolvedRelativeImports += 1;
+        if (state.unresolvedImportItems.length < 100) state.unresolvedImportItems.push({ file: f, spec });
       }
     }
     edges.set(f, [...deps]);
@@ -922,11 +949,20 @@ export async function scanProject(rootDir) {
   }
 
   const deadFiles = [];
+  const dynamicTemplates = state.dynamicImportsItems
+    .map((u) => dynamicTemplateToGlob(u.file, u.expr, root))
+    .filter(Boolean);
   for (const f of files) {
     if (entries.has(f) || reachable.has(f) || generated.includes(f)) continue;
     const rel = relative(root, f).replace(/\\/g, '/');
     const inbound = incoming.get(f) || 0;
     let { confidence, notes } = classifyConfidence(f);
+    // 被动态 import 模板命中的文件：静态无法证明未用，降为 low
+    const dynHits = dynamicTemplates.filter((t) => globToRegExp(t).test(rel));
+    if (dynHits.length) {
+      if (confidence === 'high') confidence = 'low';
+      notes = [...notes, ...dynHits.map((t) => `动态 import 模板 ${t} 可能加载它`)];
+    }
     // 类型声明文件（.d.ts）无法用引用图证明未使用：全局声明可被 tsconfig 拽入
     if (confidence === 'high' && /\.d\.[cm]?ts$/i.test(f)) {
       confidence = 'medium';
@@ -951,7 +987,7 @@ export async function scanProject(rootDir) {
       evidence,
       chain: refs.length
         ? refs.slice(0, 8).map((r) => `${r.file}${r.reachable ? '' : '（自身也不可达）'}`)
-        : (confidence === 'high' ? ['没有任何文件引用它'] : ['仅有字符串/约定层面的引用痕迹']),
+        : (confidence === 'high' ? ['没有任何文件引用它'] : ['仅有字符串/约定层面的引用痕迹', ...notes.slice(0, 4)]),
     });
   }
   const rank = { high: 0, medium: 1, low: 2 };
@@ -1092,6 +1128,17 @@ export async function scanProject(rootDir) {
       ignoredDirs: state.ignoredDirs,
       skippedFiles: state.skippedFiles,
       unresolvedRelativeImports: state.unresolvedRelativeImports,
+      unresolvedImportItems: state.unresolvedImportItems.map((u) => ({
+        file: relative(root, u.file).replace(/\\/g, '/'),
+        spec: u.spec,
+      })),
+      dynamicImports: {
+        total: state.dynamicImportsItems.length,
+        items: state.dynamicImportsItems.map((u) => ({
+          file: relative(root, u.file).replace(/\\/g, '/'),
+          expr: u.expr,
+        })),
+      },
       deadByConfidence: byConfidence,
       hasPackage: Boolean(rootPkg),
     },

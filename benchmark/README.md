@@ -44,3 +44,14 @@ npm run coverage
 | 函数覆盖 | 87.81% |
 
 llm.js 的网络路径用 mock 单测覆盖；真实 API 调用不进入 CI（无密钥）。
+
+## 4. 对抗性语料（fixtures/adversarial）
+
+不选「正常项目」，专挑会暴露静态分析天花板的结构：
+
+- 动态模板 import：`` import(`./pages/${name}.ts`) `` —— 目标文件降 low 置信度并给出模板证据，不静默判死
+- tsconfig paths 别名：`@/components/beta` 解析成功，不误报
+- 条件导出包（exports 字段）import 正常计入，未用依赖只报真的没用的
+- 真死文件（orphan.ts）仍判 high
+
+`scan fixtures/adversarial --json` 实测：dynamicImports.total=2，pages/home.ts 与 chunk-x.ts 为 low（证据含「动态 import 模板」），orphan.ts 为 high；unusedDeps 仅 unused-dep。

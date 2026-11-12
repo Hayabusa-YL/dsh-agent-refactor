@@ -1,0 +1,9 @@
+﻿{
+  "name": "adversarial-fixture",
+  "version": "0.0.0",
+  "main": "src/main.ts",
+  "dependencies": {
+    "@scope/cond-pkg": "^1.0.0",
+    "unused-dep": "^1.0.0"
+  }
+}

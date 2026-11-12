@@ -1,6 +1,6 @@
 {
   "name": "agent-refactor",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "AST-powered code health CLI: dead code, unused deps, cycles — with evidence chains",
   "type": "module",
   "bin": {
@@ -8,8 +8,8 @@
   },
   "main": "src/cli.js",
   "scripts": {
-    "test": "node --test test/scan.test.js test/fix.test.js test/splitter.test.js test/split-flow.test.js test/frameworks.test.js test/regression.test.js test/split-behavior.test.js test/safety.test.js test/batch.test.js test/split-flow-vue.test.js test/vscode-extension.test.js test/llm.test.js",
-    "coverage": "node --test --experimental-test-coverage test/scan.test.js test/fix.test.js test/splitter.test.js test/split-flow.test.js test/frameworks.test.js test/regression.test.js test/split-behavior.test.js test/safety.test.js test/batch.test.js test/split-flow-vue.test.js test/vscode-extension.test.js test/llm.test.js",
+    "test": "node --test test/scan.test.js test/fix.test.js test/splitter.test.js test/split-flow.test.js test/frameworks.test.js test/regression.test.js test/split-behavior.test.js test/safety.test.js test/batch.test.js test/split-flow-vue.test.js test/vscode-extension.test.js test/llm.test.js test/adversarial.test.js",
+    "coverage": "node --test --experimental-test-coverage test/scan.test.js test/fix.test.js test/splitter.test.js test/split-flow.test.js test/frameworks.test.js test/regression.test.js test/split-behavior.test.js test/safety.test.js test/batch.test.js test/split-flow-vue.test.js test/vscode-extension.test.js test/llm.test.js test/adversarial.test.js",
     "corpus": "node scripts/validate-corpus.mjs",
     "gate": "node scripts/gate.mjs"
   },

@@ -1,5 +1,17 @@
 # 变更日志
 
+## [0.7.2] - 2026-11-12
+
+### 新增
+
+- `unresolvedImportItems`：未解析的相对/别名 import 逐条给出文件与 spec（最多 100 条），从计数升级为可追溯清单
+- `dynamicImports`：非字面量 import/require（模板字符串/表达式）逐条暴露；被动态模板命中的死文件降为 low 并给出模板证据
+- `fixtures/adversarial` 对抗性语料（动态 import、tsconfig paths、条件导出包、真死文件），附测试断言
+
+### 文档
+
+- VSCode 诊断消息改为置信度 + 证据链摘要（不再只给一句原因）
+
 ## [0.7.1] - 2026-11-12
 
 ### 新增
