@@ -53,7 +53,24 @@ export async function applyFix(root, scanResult, options = {}) {
       }
     }
 
-    // 2. 应用修改
+    // 2. 门禁预检：无测试命令时先过静态安全门（应用前检查入口指向与工作区状态）
+    const gate = await detectTestCommand(root);
+    let staticGate = null;
+    if (!skipTests && !gate.command) {
+      staticGate = await staticSafetyGate(root, plan);
+      if (!staticGate.ok) {
+        await rm(backupDir, { recursive: true, force: true });
+        return {
+          ok: false,
+          applied: false,
+          plan,
+          staticGate,
+          message: `静态安全门未通过：${staticGate.problems.join('；')}`,
+        };
+      }
+    }
+
+    // 3. 应用修改
     for (const rel of plan.deleteFiles) {
       await rm(join(root, rel), { force: true });
     }
@@ -66,8 +83,7 @@ export async function applyFix(root, scanResult, options = {}) {
       await writeFile(pkgPath, JSON.stringify(pkg, null, 2) + '\n', 'utf8');
     }
 
-    // 3. 测试门禁
-    const gate = await detectTestCommand(root);
+    // 4. 测试门禁
     let testResult = null;
     if (!skipTests && gate.command) {
       testResult = await runCommand(gate.command, root);
@@ -82,19 +98,20 @@ export async function applyFix(root, scanResult, options = {}) {
           message: '测试失败，已自动回滚',
         };
       }
-    } else if (!skipTests && !gate.command) {
-      await rollback(root, backups, pkgPath, pkgBackup);
-      return {
-        ok: false,
-        applied: false,
-        rolledBack: true,
-        plan,
-        message: '未找到测试命令（可用 .agentrefactorrc 配置 testCommand，或加 --skip-tests）',
-      };
+    } else if (!skipTests && staticGate) {
+      testResult = { command: null, ok: true, static: true, ms: 0, tail: ['无测试命令，静态安全门已通过'] };
     }
 
     await rm(backupDir, { recursive: true, force: true });
-    return { ok: true, applied: true, plan, backups: backups.length, test: testResult, message: '修复完成，测试通过' };
+    return {
+      ok: true,
+      applied: true,
+      plan,
+      backups: backups.length,
+      test: testResult,
+      staticGate,
+      message: gate.command ? '修复完成，测试通过' : '修复完成，静态安全门通过（未跑测试）',
+    };
   } catch (e) {
     try {
       await rollback(root, backups, pkgPath, pkgBackup);
@@ -139,10 +156,53 @@ async function detectTestCommand(root) {
   return { command: null };
 }
 
-export function runCommand(command, cwd) {
+/**
+ * 无测试命令时的静态安全门：
+ * 1) package.json 的入口字段不能指向被删文件（main/module/bin/exports 等）
+ * 2) git 工作区必须干净——自动回滚失败会丢未提交改动
+ * 通过则允许删除，message 标注「未跑测试」。
+ */
+async function staticSafetyGate(root, plan) {
+  const problems = [];
+  const deleted = plan.deleteFiles.map((f) => f.replace(/\\/g, '/'));
+
+  // 入口字段指向检查
+  try {
+    const pkg = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'));
+    const entryKeys = ['main', 'module', 'browser', 'types', 'typings', 'bin', 'exports'];
+    const hits = [];
+    const walk = (value, keyPath) => {
+      if (typeof value === 'string') {
+        const norm = value.replace(/^\.\/+/, '').replace(/\\/g, '/');
+        const normNoExt = norm.replace(/\.(?:js|mjs|cjs|ts|tsx|jsx|json)$/, '');
+        for (const d of deleted) {
+          const dNoExt = d.replace(/\.(?:js|mjs|cjs|ts|tsx|jsx|json)$/, '');
+          if (norm === d || norm === dNoExt || normNoExt === dNoExt) hits.push(`${keyPath}：${value}`);
+        }
+      } else if (value && typeof value === 'object') {
+        for (const [k, v] of Object.entries(value)) walk(v, `${keyPath}.${k}`);
+      }
+    };
+    for (const key of entryKeys) if (pkg[key] != null) walk(pkg[key], key);
+    if (hits.length) problems.push(`package.json 入口仍指向被删文件：${[...new Set(hits)].join('；')}`);
+  } catch {
+    /* 无 package.json 或格式错误，跳过入口检查 */
+  }
+
+  // git 工作区干净检查（仅 git 仓库）
+  const git = await runCommand('git status --porcelain', root);
+  if (git.ok) {
+    const dirty = (git.tail || []).join('\n').trim();
+    if (dirty) problems.push('git 工作区有未提交改动，自动回滚可能丢改动，请先提交或 stash');
+  }
+
+  return { ok: problems.length === 0, problems };
+}
+
+export function runCommand(command, cwd, env = process.env) {
   return new Promise((resolvePromise) => {
     const started = Date.now();
-    const child = spawn(command, { cwd, shell: true, stdio: ['ignore', 'pipe', 'pipe'] });
+    const child = spawn(command, { cwd, shell: true, env, stdio: ['ignore', 'pipe', 'pipe'] });
     let output = '';
     child.stdout.on('data', (d) => (output += d));
     child.stderr.on('data', (d) => (output += d));

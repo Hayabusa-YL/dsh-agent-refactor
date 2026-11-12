@@ -204,8 +204,11 @@ function printSplitResult(res, chalk) {
     return;
   }
   if (res.rolledBack) {
-    const reason = res.stage === 'verify' ? '构建失败' : res.stage === 'verify-runtime' ? '运行冒烟失败' : res.message || '应用失败';
+    const reason = res.stage === 'verify' ? '构建失败' : res.stage === 'verify-regression' ? '回归验证失败' : res.stage === 'verify-runtime' ? '运行冒烟失败' : res.message || '应用失败';
     console.log(chalk.red(`  已自动回滚：${reason}`));
+    if (res.regression?.tail?.length) {
+      res.regression.tail.slice(-8).forEach((l) => console.log(chalk.dim(`    ${l}`)));
+    }
     if (res.smoke?.tail?.length) {
       res.smoke.tail.slice(-8).forEach((l) => console.log(chalk.dim(`    ${l}`)));
     }
@@ -217,6 +220,10 @@ function printSplitResult(res, chalk) {
   if (res.ok) {
     if (res.stage === 'done' || res.written) {
       console.log(chalk.green(`  ✓ 拆分完成：写入 ${res.written?.length || 0} 个文件，构建通过（${res.build?.ms || 0}ms）`));
+      if (res.regression) {
+        const mode = res.regression.mode === 'behavior' ? '行为快照' : '静态结构';
+        console.log(chalk.dim(`    回归验证：${mode}（${res.regression.ms || 0}ms）`));
+      }
       for (const w of res.written || []) console.log(chalk.dim(`    + ${w}`));
     } else {
       console.log(chalk.green('  ✓ 分析完成：拆分计划已通过校验（未落地代码）'));

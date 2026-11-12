@@ -91,3 +91,50 @@ test('fix only deletes high-confidence dead files', async () => {
   }
 });
 
+async function makeNoTestProject({ mainToOrphan = false } = {}) {
+  const dir = await mkdtemp(join(tmpdir(), 'ar-fix-notest-'));
+  const pkg = {
+    name: 'fixture-fix-notest',
+    version: '1.0.0',
+    main: mainToOrphan ? 'src/orphan.js' : 'src/index.js',
+    dependencies: { 'unused-pkg': '^1.0.0' },
+  };
+  await writeFile(join(dir, 'package.json'), JSON.stringify(pkg, null, 2), 'utf8');
+  await mkdir(join(dir, 'src'), { recursive: true });
+  await writeFile(join(dir, 'src', 'index.js'), 'export const ok = 1;\n', 'utf8');
+  await writeFile(join(dir, 'src', 'orphan.js'), 'export const orphan = 2;\n', 'utf8');
+  return dir;
+}
+
+test('fix without test command passes static safety gate', async () => {
+  const dir = await makeNoTestProject();
+  try {
+    const scan = await scanProject(dir);
+    const res = await applyFix(dir, scan, { yes: true });
+    assert.equal(res.ok, true, JSON.stringify(res));
+    assert.equal(res.applied, true);
+    assert.ok(res.staticGate?.ok, 'static gate should pass');
+    assert.match(res.message, /静态安全门通过/);
+    const orphanExists = await readFile(join(dir, 'src', 'orphan.js')).then(() => true).catch(() => false);
+    assert.equal(orphanExists, false, 'orphan deleted via static gate');
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test('fix without test command refuses when package.json main points at deleted file', async () => {
+  const dir = await makeNoTestProject({ mainToOrphan: true });
+  try {
+    // 直接构造扫描结果：真实 scan 会把 main 指向的文件当入口，这里单测静态门本身
+    const scan = { deadFiles: [{ file: 'src/orphan.js', confidence: 'high' }], unusedDeps: [] };
+    const res = await applyFix(dir, scan, { yes: true });
+    assert.equal(res.ok, false);
+    assert.equal(res.applied, false);
+    assert.ok(res.staticGate?.problems.some((p) => p.includes('入口')), JSON.stringify(res.staticGate));
+    const orphanExists = await readFile(join(dir, 'src', 'orphan.js')).then(() => true).catch(() => false);
+    assert.equal(orphanExists, true, 'file untouched when static gate fails');
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+

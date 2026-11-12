@@ -6,6 +6,7 @@ import { join, dirname, resolve, relative } from 'node:path';
 import { tmpdir } from 'node:os';
 import { analyzeComponent, planSplit, validatePlan, generateComponents, validateGenerated } from './splitter.js';
 import { verifyBuild } from './verify.js';
+import { captureBehaviorBaseline, verifySplitRegression } from './regression.js';
 import { runCommand } from './fix.js';
 
 const MIN_LINES = 300;
@@ -39,6 +40,9 @@ export async function splitComponent({ root, componentRel, llm, dryRun = false, 
   const genErrors = validateGenerated(generated, plan);
   if (genErrors.length) return { ok: false, stage: 'generate', plan, errors: genErrors };
 
+  // 拆分前采集行为基线（原组件渲染 HTML），环境不支持时返回 null，后续走静态模式
+  const baseline = await captureBehaviorBaseline(root, componentRel);
+
   const backupDir = await mkdtemp(join(tmpdir(), 'ar-split-'));
   const backupPath = join(backupDir, 'original.txt');
   await cp(componentPath, backupPath);
@@ -69,7 +73,14 @@ export async function splitComponent({ root, componentRel, llm, dryRun = false, 
     };
 
     const build = await verifyBuild(root);
-    if (!build.ok) return failVerify('verify', { build, plan, written });
+    if (!build.ok) {
+      if (baseline?.path) await rm(baseline.path, { force: true }).catch(() => {});
+      return failVerify('verify', { build, plan, written });
+    }
+
+    // 回归验证：行为快照优先，环境不支持时走静态结构回归
+    const regression = await verifySplitRegression(root, { componentRel, generated, plan, baseline });
+    if (!regression.ok) return failVerify('verify-regression', { regression, build, plan, written });
 
     let smoke = null;
     if (verifyCmd) {
@@ -82,9 +93,11 @@ export async function splitComponent({ root, componentRel, llm, dryRun = false, 
       plan,
       written,
       build: { command: build.command, ms: build.ms },
+      regression: { mode: regression.mode, ms: regression.ms },
       smoke: smoke ? { command: smoke.command, ms: smoke.ms } : null,
     };
   } catch (e) {
+    if (baseline?.path) await rm(baseline.path, { force: true }).catch(() => {});
     await rollback(written, componentRel, root, componentPath, backupPath);
     return { ok: false, stage: 'apply', rolledBack: true, message: e.message };
   }
