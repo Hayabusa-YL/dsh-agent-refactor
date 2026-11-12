@@ -1,0 +1,21 @@
+{
+  "generatedAt": "2026-11-12T02:51:46.796Z",
+  "toolVersion": "0.5.0",
+  "repos": [
+    {
+      "repo": "C:\\Users\\25670\\Desktop\\dsh-clean\\projects\\agent-refactor\\fixtures\\real-repo",
+      "ok": true,
+      "ms": 417,
+      "filesScanned": 391,
+      "deadFiles": 14,
+      "deadByConfidence": {
+        "high": 6,
+        "medium": 7,
+        "low": 1
+      },
+      "unusedDeps": 2,
+      "cycles": 0,
+      "version": "0.5.0"
+    }
+  ]
+}

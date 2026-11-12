@@ -1,5 +1,16 @@
 # 变更日志
 
+## [0.6.0] - 2026-11-12
+
+### 修复
+
+- 版本号硬编码：`scan` 输出的 `meta.version` 与 CLI `--version` 改为从 package.json 读取（此前分别硬编码 0.2.0 / 0.1.0）
+
+### 新增
+
+- 公开量化 benchmark：`node scripts/bench.mjs` 对语料仓库输出扫描耗时、文件数、死代码（按置信度）、未用依赖、循环依赖，写 `benchmark/latest.json`
+- VSCode 插件最小版：`vscode-extension/`，命令面板「Agent Refactor: 体检当前项目」，诊断标在编辑器；新增语法/声明校验测试
+
 ## [0.5.0] - 2026-11-12
 
 ### 新增

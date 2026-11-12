@@ -1,5 +1,9 @@
 import { readdir, readFile, stat } from 'node:fs/promises';
 import { join, extname, resolve, dirname, relative, isAbsolute, sep } from 'node:path';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
+const pkg = require('../package.json');
 
 const IGNORE_DIRS = new Set([
   'node_modules', '.git', 'dist', 'build', 'out', 'coverage', 'tests', 'vendor', 'public',
@@ -1064,7 +1068,7 @@ export async function scanProject(rootDir) {
   return {
     meta: {
       tool: 'agent-refactor',
-      version: '0.2.0',
+      version: pkg.version,
       scannedAt: new Date().toISOString(),
       root,
       scannedFiles: files.length,

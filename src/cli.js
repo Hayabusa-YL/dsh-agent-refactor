@@ -1,6 +1,10 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
 import { resolve, relative } from 'node:path';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
+const pkg = require('../package.json');
 import { readFile } from 'node:fs/promises';
 import { scanProject } from './scan.js';
 import { applyFix } from './fix.js';
@@ -13,7 +17,7 @@ export function run(argv) {
   const program = new Command();
   program
     .name('agent-refactor')
-    .version('0.1.0')
+    .version(pkg.version)
     .description('代码体检：死代码、未用依赖、循环依赖，每一条都附证据链');
 
   program

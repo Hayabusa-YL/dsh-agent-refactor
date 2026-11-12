@@ -1,0 +1,35 @@
+{
+  "name": "agent-refactor-vscode",
+  "displayName": "Agent Refactor",
+  "description": "一键体检：死代码、未用依赖、循环依赖，结果直接标在编辑器",
+  "version": "0.1.0",
+  "publisher": "hayabusa-yl",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Linters"
+  ],
+  "activationEvents": [
+    "onCommand:agentRefactor.scan"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "agentRefactor.scan",
+        "title": "Agent Refactor: 体检当前项目"
+      }
+    ],
+    "configuration": {
+      "title": "Agent Refactor",
+      "properties": {
+        "agentRefactor.cliPath": {
+          "type": "string",
+          "default": "bin/cli.js",
+          "description": "相对工作区根目录的 CLI 入口"
+        }
+      }
+    }
+  }
+}
