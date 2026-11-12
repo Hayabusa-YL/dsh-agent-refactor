@@ -54,6 +54,16 @@
 
 **扫描精度**（2026-11 修复）：入口可达性 + 置信度分级后，real-repo 死代码 108 → 14，旧报告 100 条误报抽检 0 条仍是 high；mini-leads 旧报告 4 条误报全部降级；giant-app 0 条 high。fix 只删 high 置信死文件。
 
+**真实仓库回归语料**（2026-12，三个真实开源仓库 `git clone --depth 1` 后裸跑，可用 `npm run corpus` 复现）：
+
+| 仓库 | 扫描文件 | 死代码（high/medium） | 未用依赖 | 说明 |
+| --- | --- | --- | --- | --- |
+| unjs/ofetch | 19 | 0 / 0 | 0 | examples/ 是入口；`--coverage`/`provider` 推断 coverage 包、automd 文档标记不算未用 |
+| vuejs/create-vue | 101 | 0 / 68 | 0 | 68 条全是 template/ 下的模板片段（生成器复制出去的资源），标 medium 不删；模板包依赖不检查 |
+| unplugin/unplugin-auto-import | 114 | 1 / 0 | 1 | 唯一 high 是 `src/presets/preact-compat.ts`，全仓库确实零引用；唯一未用依赖 `@svgr/plugin-jsx` 全仓库零引用，是真·遗留 |
+
+这一轮修掉的现实问题：monorepo 每个包的框架路由目录、Astro/Svelte 文件解析、配置里 `dirs: ['src/views']` 式自动导入目录、`dist/x.mjs` 导出回推 `src/x.ts` 源码入口、tsconfig `extends`/脚本 CLI/配置字符串里的依赖不算未用；templates/examples/playground 包是交付给用户的资源包不做依赖检查；脚本里的 CLI 别名（`nr`→@antfu/ni、`run-p`→npm-run-all2、`tsgo`→native-preview）映射到真实包；vitest coverage 按 `--coverage` 与 `provider` 推断缺的包。
+
 **成本**：单组件完整拆分（分析 + 规划 + 生成，共 3 次 LLM 调用）约 2–3 万 token，按 DeepSeek 价格约 **3–5 分钱**；失败回喂修复每轮再加约 3 千 token。样本与记录见 `memory/audit/split-engine-2026-11-15.md`。
 
 ## 诚实边界（先看这里）
@@ -62,6 +72,8 @@
 2. **真实仓库构建验证已做一次**（ant-design-pro advanced-form 页面，构建+类型检查通过）；antd 的 822 行 InternalTable 只验证了规划质量，因为依赖 30+ 内部模块无法独立构建。
 3. **LLM 生成是非确定性的。** 同一组件两次拆分结果可能不同；工具记录每次的模型版本与成本，便于审计。
 4. **验证等级标注**：每条结论都会标注「编译级 / 结构级 / 行为级」，行为级不承诺，只标注。
+5. **动态加载摸不到。** 靠 resolver 自动导入的包（如 element-plus、@iconify-json/*）、生成器运行时拼接的模板路径，静态图里没有引用边：前者可能仍出现在「未用依赖」，后者一律降为 medium 不自动删。
+6. **examples / templates 走约定而非引用。** examples、playground、demo 目录按入口处理；templates 目录按「复制出去的资源」标 medium——真实删除前请人工确认。
 
 ## 安全保证
 
@@ -117,3 +129,4 @@ export AGENT_REFACTOR_LLM_MODEL=deepseek-chat
 - [ ] 批量拆分：扫全项目巨组件，逐个拆
 - [x] 真实仓库端到端构建验证（ant-design-pro advanced-form，构建 + 类型检查通过）
 - [x] GitHub Action：PR / push 自动体检评论（.github/workflows/self-scan.yml）
+- [x] 真实仓库回归语料（create-vue / ofetch / unplugin-auto-import，`npm run corpus` 复现）

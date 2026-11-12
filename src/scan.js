@@ -1,5 +1,5 @@
 import { readdir, readFile, stat } from 'node:fs/promises';
-import { join, extname, resolve, dirname, relative, isAbsolute } from 'node:path';
+import { join, extname, resolve, dirname, relative, isAbsolute, sep } from 'node:path';
 
 const IGNORE_DIRS = new Set([
   'node_modules', '.git', 'dist', 'build', 'out', 'coverage', 'tests', 'vendor', 'public',
@@ -8,27 +8,42 @@ const IGNORE_DIRS = new Set([
 // 框架生成的目录：内容由框架按约定加载，不能当成死代码来源
 const GENERATED_DIR_RE = /(^|[\\/])\.(umi|umi-production|umi-test|next|nuxt|svelte-kit|output)([\\/]|$)/i;
 
-const CODE_EXTS = new Set(['.js', '.mjs', '.cjs', '.jsx', '.ts', '.tsx', '.vue']);
+const CODE_EXTS = new Set(['.js', '.mjs', '.cjs', '.jsx', '.ts', '.tsx', '.vue', '.astro', '.svelte']);
 
 // 模块解析候选：TS 先于 JS，最后补 .d.ts（`import type ... from '../data'`）
 const RESOLVE_EXTS = [
-  '.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.json', '.vue',
+  '.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.json', '.vue', '.astro', '.svelte',
   '.d.ts', '.d.mts', '.d.cts',
 ];
-const INDEX_EXTS = ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.vue', '.d.ts'];
+const INDEX_EXTS = ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.vue', '.astro', '.svelte', '.d.ts'];
 
-const CONFIG_FILE_RE = /(^|[\\/])((vite|webpack|next|umi|rollup|rspack|vue|svelte|astro|nuxt|vitest|jest|playwright|babel|tailwind|postcss|commitlint|biome|eslint|storybook)\.config\.[cm]?[jt]s|\.umirc\.[cm]?[jt]s|config[\\/]config\.[cm]?[jt]s)$/i;
+const CONFIG_FILE_RE = /(^|[\\/])((vite|webpack|next|umi|rollup|rspack|vue|svelte|astro|nuxt|vitest|jest|playwright|babel|tailwind|postcss|commitlint|biome|eslint|storybook|tsdown|tsup|unbuild|rslib|unocss)\.config\.[cm]?[jt]s|\.umirc\.[cm]?[jt]s|config[\\/]config\.[cm]?[jt]s)$/i;
 const RC_CONFIG_RE = /(^|[\\/])\.[\w-]+rc\.[cm]?[jt]s$/i;
 
-const ENTRY_NAMES = ['index', 'main', 'app', 'server', 'entry'];
+const ENTRY_NAMES = ['index', 'main', 'app', 'App', 'server', 'entry'];
+
+// 框架单体入口文件（非 .config 命名）：Gatsby 的 gatsby-config 等
+const CONFIG_FILE_EXTRA_RE = /(^|[\\/])(gatsby-(config|node|browser|ssr)\.[cm]?[jt]s|\.storybook[\\/][^\\/]+\.(?:[cm]?[jt]s))$/i;
 
 const TOOLCHAIN = new Set([
   'eslint', 'prettier', 'typescript', 'vite', 'vitest', 'jest', 'webpack', 'rollup',
   'esbuild', 'postcss', 'autoprefixer', 'tailwindcss', 'sass', 'less',
   'ts-node', 'lint-staged', 'husky', 'nodemon', 'cross-env', 'concurrently',
   'webpack-cli', 'rollup-plugin', '@vue/compiler-sfc', 'vue-tsc',
-  'rimraf', 'patch-package',
+  'rimraf', 'patch-package', 'publint', 'automd',
 ]);
+
+// 脚本里常见的 CLI 别名 → 真正提供它的包（脚本里叫 nr，包叫 @antfu/ni）
+const SCRIPT_BIN_PKGS = {
+  nr: '@antfu/ni',
+  ni: '@antfu/ni',
+  nlx: '@antfu/ni',
+  nun: '@antfu/ni',
+  'run-p': 'npm-run-all2',
+  'run-s': 'npm-run-all2',
+  'npm-run-all': 'npm-run-all2',
+  tsgo: '@typescript/native-preview',
+};
 
 const BUILTINS = new Set([
   'fs', 'path', 'url', 'util', 'events', 'stream', 'http', 'https', 'os', 'crypto',
@@ -42,6 +57,12 @@ function extractScripts(code, file) {
   let src = code;
   if (file.endsWith('.vue')) {
     const m = code.match(/<script[^>]*>([\s\S]*?)<\/script>/i);
+    src = m ? m[1] : '';
+  } else if (file.endsWith('.svelte')) {
+    src = [...code.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/gi)].map((m) => m[1]).join('\n');
+  } else if (file.endsWith('.astro')) {
+    // Astro 的 import 全在文件头部的 `---` frontmatter 里
+    const m = code.match(/^---\s*([\s\S]*?)\s*---/);
     src = m ? m[1] : '';
   }
   return src;
@@ -222,7 +243,7 @@ function collectExportStrings(value, out) {
 
 function isConfigFile(file, root) {
   const rel = relative(root, file).replace(/\\/g, '/');
-  return CONFIG_FILE_RE.test(file) || RC_CONFIG_RE.test(file) || rel === 'config/config.ts' || rel === 'config/config.js';
+  return CONFIG_FILE_RE.test(file) || CONFIG_FILE_EXTRA_RE.test(file) || RC_CONFIG_RE.test(file) || rel === 'config/config.ts' || rel === 'config/config.js';
 }
 
 function isTestFile(file, root) {
@@ -255,6 +276,7 @@ export async function scanProject(rootDir) {
     if (base === 'tsconfig.json' || base === 'jsconfig.json') tsconfigs.push(p);
   }
   const aliases = [];
+  const configReferenced = new Set(); // 配置/脚本/tsconfig extends 里点名用到的包（非 import）
   const typeRoots = new Set();
   for (const tsPath of tsconfigs) {
     const rel = relative(root, tsPath).replace(/\\/g, '/');
@@ -262,6 +284,9 @@ export async function scanProject(rootDir) {
     const json = await loadJson(tsPath);
     if (!json) continue;
     const baseDir = dirname(tsPath);
+    for (const e of [].concat(json.extends || [])) {
+      if (typeof e === 'string' && !e.startsWith('.')) configReferenced.add(toPackageName(e));
+    }
     const paths = json.compilerOptions?.paths;
     if (paths && typeof paths === 'object') {
       for (const [pattern, targets] of Object.entries(paths)) {
@@ -380,13 +405,34 @@ export async function scanProject(rootDir) {
     if (fileSet.has(abs)) entries.add(abs);
   }
 
+  // 弱证据（字符串/约定引用）：在弱引用表上登记，用于降级置信度
+  const weakRefs = new Map(); // target -> [{ from, kind }]
+  function addWeak(target, from, kind) {
+    if (!target || target === from) return;
+    if (!weakRefs.has(target)) weakRefs.set(target, []);
+    const list = weakRefs.get(target);
+    if (!list.some((r) => r.from === from && r.kind === kind)) list.push({ from, kind });
+  }
+
   function addEntryFrom(baseDir, value) {
     if (typeof value !== 'string') return;
     if (value.includes('*')) return;
     const cleaned = value.replace(/^\.\//, '');
     if (!isAbsolute(cleaned) && (cleaned.startsWith('node:') || cleaned.startsWith('http'))) return;
     const abs = isAbsolute(cleaned) ? resolve(cleaned) : resolve(baseDir, cleaned);
-    if (withinRoot(abs)) addEntry(abs);
+    if (withinRoot(abs) && fileSet.has(abs)) {
+      addEntry(abs);
+      return;
+    }
+    // 构建产物入口回推源码（unbuild/tsup 常见：dist/x.mjs ← src/x.ts）
+    const m = cleaned.match(/^(?:dist|lib|build|out)\/(.+?)\.(?:[cm]?js|d\.ts)$/i);
+    if (m) {
+      const stem = m[1];
+      for (const ext of CODE_EXTS) addEntry(resolve(baseDir, 'src', stem + ext));
+      for (const ext of CODE_EXTS) addEntry(resolve(baseDir, 'src', stem, 'index' + ext));
+    } else if (withinRoot(abs)) {
+      addEntry(abs);
+    }
   }
 
   function addEntryNames(baseDir) {
@@ -442,7 +488,189 @@ export async function scanProject(rootDir) {
     }
   }
 
-  // 框架生成目录：由框架按约定装配，整体视为可达种子（不参与死代码判定）
+  // ---------- 框架约定入口（按依赖/配置识别，避免误伤普通目录） ----------
+  const depNames = [];
+  for (const pr of packageRoots) {
+    const j = pr.json;
+    if (!j) continue;
+    for (const k of Object.keys({
+      ...(j.dependencies || {}),
+      ...(j.devDependencies || {}),
+      ...(j.peerDependencies || {}),
+    })) {
+      if (!depNames.includes(k)) depNames.push(k);
+    }
+  }
+  const hasDep = (name) => depNames.includes(name);
+  const hasDepPrefix = (prefix) => depNames.some((d) => d.startsWith(prefix));
+  const relOf = (f) => relative(root, f).replace(/\\/g, '/');
+  const hasRootConfig = (re) => files.some((f) => re.test(relOf(f)));
+  const addEntriesUnder = (dirRel, re) => {
+    for (const pr of packageRoots) {
+      const relDir = relOf(join(pr.dir, dirRel));
+      for (const f of files) {
+        const rel = relOf(f);
+        if ((rel === relDir || rel.startsWith(relDir + '/')) && re.test(rel)) addEntry(f);
+      }
+    }
+  };
+
+  // 配置里点名的依赖与自动导入目录（unplugin-auto-import / vue-components / tsconfig extends）
+  const autoImportDirs = [];
+  const cfgFiles = files.filter((f) => isConfigFile(f, root));
+  for (const cf of cfgFiles) {
+    let code = '';
+    try {
+      code = await readFile(cf, 'utf8');
+    } catch {
+      continue;
+    }
+    for (const key of ['dirs', 'components', 'imports', 'resolvers', 'external']) {
+      const re = new RegExp(key + '\\s*:\\s*\\[([\\s\\S]{0,800}?)\\]', 'g');
+      for (const m of code.matchAll(re)) {
+        if (key === 'dirs' || key === 'components') {
+          autoImportDirs.push({ base: dirname(cf), text: m[1] });
+          continue;
+        }
+        for (const q of m[1].matchAll(/['"`]([^'"`\n]+)['"`]/g)) {
+          const tok = q[1].trim();
+          if (!tok || tok.includes('${')) continue;
+          configReferenced.add(toPackageName(tok));
+        }
+      }
+    }
+    // 配置文件里出现的字符串字面量也算“点名”（jsdom 环境、CLI 名称、preset 名等）
+    for (const q of code.matchAll(/['"`]([^'"`\n]{1,120})['"`]/g)) {
+      const tok = q[1].trim();
+      if (!tok || tok.startsWith('.') || tok.includes('${') || /[\s\\]/.test(tok)) continue;
+      configReferenced.add(toPackageName(tok));
+    }
+    // vitest coverage: { provider: 'v8' } → @vitest/coverage-v8；没写 provider 默认 v8
+    if (/coverage\s*:/.test(code)) {
+      const pm = code.match(/provider\s*:\s*['"]([^'"]+)['"]/);
+      configReferenced.add('@vitest/coverage-' + (pm ? pm[1] : 'v8'));
+    }
+  }
+  for (const { base, text } of autoImportDirs) {
+    for (const q of text.matchAll(/['"`]([^'"`\n]+)['"`]/g)) {
+      const tok = q[1].trim();
+      if (!tok || tok.startsWith('.') || tok.includes('*') || tok.includes('${')) continue;
+      const relDir = relOf(resolve(base, tok));
+      for (const f of files) {
+        const r = relOf(f);
+        if (r === relDir || r.startsWith(relDir + '/')) addWeak(f, null, 'convention');
+      }
+    }
+  }
+  const frameworks = [];
+
+  // Next.js：pages/ 路由、app/ 特殊文件、middleware/instrumentation
+  if (hasDep('next') || hasRootConfig(/^next\.config\.[cm]?[jt]s$/)) {
+    frameworks.push('next');
+    addEntriesUnder('pages', /\.[cm]?[jt]sx?$/);
+    addEntriesUnder('src/pages', /\.[cm]?[jt]sx?$/);
+    for (const dir of ['app', 'src/app']) {
+      addEntriesUnder(dir, /(^|\/)(page|layout|loading|error|global-error|template|not-found|route)\.[cm]?[jt]sx?$/);
+    }
+    for (const f of files) {
+      if (/(^|\/)(src\/)?(middleware|instrumentation)\.[cm]?[jt]s$/.test(relOf(f))) addEntry(f);
+    }
+  }
+
+  // Nuxt：pages/layouts/middleware/plugins/server 路由 + 自动导入目录
+  if (hasDep('nuxt')) {
+    frameworks.push('nuxt');
+    for (const dir of ['pages', 'layouts', 'middleware', 'plugins', 'server/api', 'server/routes', 'server/middleware', 'server/plugins']) {
+      addEntriesUnder(dir, /\.(vue|[cm]?[jt]sx?)$/);
+    }
+    for (const f of files) {
+      const rel = relOf(f);
+      if (/^(app|error)\.vue$/.test(rel) || /^nuxt\.config\.[cm]?[jt]s$/.test(rel)) addEntry(f);
+      if (/(^|\/)(components|composables|utils)\//.test(rel) && /\.(vue|[cm]?[jt]sx?)$/.test(rel)) {
+        addWeak(f, null, 'convention');
+      }
+    }
+  }
+
+  // Remix：app/routes 路由 + root/entry 文件
+  if (hasDepPrefix('@remix-run/')) {
+    frameworks.push('remix');
+    addEntriesUnder('app/routes', /\.[cm]?[jt]sx?$/);
+    for (const f of files) {
+      if (/(^|\/)app\/(root|entry\.client|entry\.server)\.[cm]?[jt]sx?$/.test(relOf(f))) addEntry(f);
+    }
+  }
+
+  // SvelteKit：src/routes + hooks
+  if (hasDep('@sveltejs/kit')) {
+    frameworks.push('sveltekit');
+    addEntriesUnder('src/routes', /\.(svelte|[cm]?[jt]sx?)$/);
+    for (const f of files) {
+      if (/(^|\/)src\/hooks\.(client|server)\.[cm]?[jt]s$/.test(relOf(f))) addEntry(f);
+    }
+  }
+
+  // Astro：src/pages + middleware + content 配置
+  if (hasDep('astro')) {
+    frameworks.push('astro');
+    addEntriesUnder('src/pages', /\.(astro|[cm]?[jt]sx?)$/);
+    for (const f of files) {
+      if (/(^|\/)src\/(middleware\.[cm]?[jt]s|content\/config\.[cm]?[jt]s)$/.test(relOf(f))) addEntry(f);
+    }
+  }
+
+  // Gatsby：src/pages + gatsby-* 入口
+  if (hasDep('gatsby')) {
+    frameworks.push('gatsby');
+    addEntriesUnder('src/pages', /\.([cm]?[jt]sx?)$/);
+    for (const f of files) {
+      if (/^(gatsby-(config|node|browser|ssr))\.[cm]?[jt]s$/.test(relOf(f))) addEntry(f);
+    }
+  }
+
+  // Expo Router：app 目录按路由加载
+  if (hasDep('expo')) {
+    frameworks.push('expo');
+    addEntriesUnder('app', /\.[cm]?[jt]sx?$/);
+  }
+
+  // Storybook：stories 是扫描入口，本身没人 import
+  if (hasDep('storybook') || hasDepPrefix('@storybook/') || hasRootConfig(/^\.storybook\//)) {
+    frameworks.push('storybook');
+    for (const f of files) {
+      if (/\.stories?\.[cm]?[jt]sx?$/.test(relOf(f))) addEntry(f);
+    }
+  }
+
+  // examples/playground/demo 是给人直接跑的样例（不是死代码）；templates 是复制出去的资源
+  for (const f of files) {
+    const rel = relOf(f);
+    if (/(^|\/)(examples?|playgrounds?|demos?)\//.test(rel)) addEntry(f);
+    else if (/(^|\/)(templates?)\//.test(rel)) addWeak(f, null, 'convention');
+  }
+
+  // HTML 入口（Vite/CRA 风格）：index.html 的 module script / modulepreload 是真实入口
+  for (const pr of packageRoots) {
+    for (const htmlRel of ['index.html', 'src/index.html']) {
+      const htmlPath = resolve(pr.dir, htmlRel);
+      let html = '';
+      try {
+        if ((await stat(htmlPath)).isFile()) html = await readFile(htmlPath, 'utf8');
+      } catch {
+        continue;
+      }
+      const fromHtml = (srcAttr) => {
+        const cleaned = stripQuery(srcAttr.trim());
+        if (!cleaned) return;
+        const abs = cleaned.startsWith('/') ? resolve(pr.dir, cleaned.slice(1)) : resolve(dirname(htmlPath), cleaned);
+        addEntry(abs);
+      };
+      for (const m of html.matchAll(/<script[^>]+src=["']([^"']+)["']/gi)) fromHtml(m[1]);
+      for (const m of html.matchAll(/<link[^>]+rel=["']modulepreload["'][^>]*href=["']([^"']+)["']/gi)) fromHtml(m[1]);
+    }
+  }
+
+
   const generated = files.filter((f) => GENERATED_DIR_RE.test(relative(root, f)));
   const seedReachable = new Set([...entries, ...generated, ...typeRoots]);
 
@@ -450,14 +678,6 @@ export async function scanProject(rootDir) {
   const edges = new Map();
   const fileRead = new Map();
   const specsAt = new Map();
-  const weakRefs = new Map(); // target -> [{ from, kind }]
-
-  function addWeak(target, from, kind) {
-    if (!target || target === from) return;
-    if (!weakRefs.has(target)) weakRefs.set(target, []);
-    const list = weakRefs.get(target);
-    if (!list.some((r) => r.from === from && r.kind === kind)) list.push({ from, kind });
-  }
 
   for (const f of files) {
     let code = '';
@@ -670,31 +890,64 @@ export async function scanProject(rootDir) {
   const rank = { high: 0, medium: 1, low: 2 };
   deadFiles.sort((a, b) => rank[a.confidence] - rank[b.confidence] || a.file.localeCompare(b.file));
 
-  // ---------- 未使用依赖 ----------
-  const importedPkgs = new Set();
+  // ---------- 未使用依赖（根包 + monorepo 子包；只标「全仓库都没人 import」的） ----------
+  const isBareSpec = (s) => !(s.startsWith('.') || s.startsWith('/') || isAbsolute(s) || BUILTINS.has(s));
+  const aliasResolved = (s) => (s.startsWith('@') || s.startsWith('~')) && resolveAliasBases(s).length > 0;
+  const globalImports = new Set();
   for (const [, specs] of specsAt) {
     for (const s of specs) {
-      if (s.startsWith('.') || s.startsWith('/') || isAbsolute(s) || BUILTINS.has(s)) continue;
-      if (s.startsWith('@') || s.startsWith('~')) {
-        const resolved = resolveAliasBases(s);
-        if (resolved.length) continue;
-      }
-      importedPkgs.add(toPackageName(s));
+      if (!isBareSpec(s) || aliasResolved(s)) continue;
+      globalImports.add(toPackageName(s));
     }
   }
-  const allDeps = { ...(rootPkg?.dependencies || {}), ...(rootPkg?.devDependencies || {}) };
+  const fileOwner = new Map();
+  for (const f of files) {
+    let best = root;
+    for (const pr of packageRoots) {
+      if ((f === pr.dir || f.startsWith(pr.dir + sep)) && pr.dir.length > best.length) best = pr.dir;
+    }
+    fileOwner.set(f, best);
+  }
+  // 脚本里点名的 CLI（bumpp/eslint/vitest 等）也算工具链使用
+  const scriptReferenced = new Set();
+  for (const pr of packageRoots) {
+    const j = pr.dir === root ? rootPkg : pr.json;
+    for (const s of Object.values(j?.scripts || {})) {
+      const str = String(s);
+      if (str.includes('--coverage')) configReferenced.add('@vitest/coverage-v8');
+      for (const m of str.matchAll(/[A-Za-z0-9@._/-]+/g)) {
+        scriptReferenced.add(toPackageName(m[0]));
+        const binPkg = SCRIPT_BIN_PKGS[m[0]];
+        if (binPkg) scriptReferenced.add(binPkg);
+      }
+    }
+  }
   const unusedDeps = [];
   const toolchainDeps = [];
-  for (const name of Object.keys(allDeps)) {
-    if (importedPkgs.has(name)) continue;
-    const base = toPackageName(name);
-    if (importedPkgs.has(base)) continue;
-    if (TOOLCHAIN.has(name) || name.startsWith('@types/') || name.startsWith('@babel/')) {
-      toolchainDeps.push({ name, note: '工具链依赖，通常不删' });
-    } else if (/^@types\/|^@([\w-]+)\/eslint/.test(name) || name.includes('eslint')) {
-      toolchainDeps.push({ name, note: '工具链依赖，通常不删' });
-    } else {
-      unusedDeps.push({ name, evidence: `扫描 ${files.length} 个源文件，无 import/require 命中` });
+  const flagged = new Map();
+  for (const pr of packageRoots) {
+    const pkgJson = pr.dir === root ? rootPkg : pr.json;
+    if (!pkgJson) continue;
+    const pkgRel = pr.dir === root ? null : relative(root, pr.dir).replace(/\\/g, '/');
+    // templates/examples/playground 是交付给用户的资源包，仓库自身不 import 它们，不报未用依赖
+    if (pkgRel && /^(?:templates?|examples?|playgrounds?|demos?)(?:\/|$)/.test(pkgRel)) continue;
+    const declared = { ...(pkgJson.dependencies || {}), ...(pkgJson.devDependencies || {}) };
+    for (const name of Object.keys(declared)) {
+      if (globalImports.has(name) || globalImports.has(toPackageName(name))) continue;
+      if (configReferenced.has(name) || configReferenced.has(toPackageName(name))) continue;
+      if (scriptReferenced.has(name) || scriptReferenced.has(toPackageName(name))) continue;
+      if (TOOLCHAIN.has(name) || /^@types\/|^@babel\//.test(name) || /^@([\w-]+)\/eslint/.test(name) || name.includes('eslint')) {
+        toolchainDeps.push({ name, workspace: pkgRel, note: '工具链依赖，通常不删' });
+        continue;
+      }
+      if (flagged.has(name)) continue;
+      const entry = {
+        name,
+        workspace: pkgRel,
+        evidence: `扫描 ${files.length} 个源文件${pkgRel ? `（声明于 workspace ${pkgRel}）` : ''}，全仓库无 import/require 命中`,
+      };
+      flagged.set(name, entry);
+      unusedDeps.push(entry);
     }
   }
 
@@ -711,11 +964,12 @@ export async function scanProject(rootDir) {
   return {
     meta: {
       tool: 'agent-refactor',
-      version: '0.1.0',
+      version: '0.2.0',
       scannedAt: new Date().toISOString(),
       root,
       scannedFiles: files.length,
-      entryFiles: [...entries].map((f) => relative(root, f)).sort(),
+      frameworks,
+      entryFiles: [...entries].map((f) => relative(root, f).replace(/\\/g, '/')).sort(),
       generatedFiles: generated.length,
       deadByConfidence: byConfidence,
       hasPackage: Boolean(rootPkg),
