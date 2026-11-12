@@ -54,7 +54,7 @@
 
 **扫描精度**（2026-11 修复）：入口可达性 + 置信度分级后，real-repo 死代码 108 → 14，旧报告 100 条误报抽检 0 条仍是 high；mini-leads 旧报告 4 条误报全部降级；giant-app 0 条 high。fix 只删 high 置信死文件。
 
-**真实仓库回归语料**（2026-12，六个真实开源仓库 `git clone --depth 1` 后裸跑，可用 `npm run corpus` 复现）：
+**真实仓库回归语料**（2026-11-12，六个真实开源仓库 `git clone --depth 1` 后裸跑，可用 `npm run corpus` 复现）：
 
 | 仓库 | 扫描文件 | 死代码（high/medium） | 未用依赖 | 说明 |
 | --- | --- | --- | --- | --- |
@@ -80,7 +80,7 @@
 
 ## 安全保证
 
-- **fix / split 永远先备份**：被改文件先复制到 `.agent-refactor/backup/`。
+- **fix / split 永远先备份**：被改文件先复制到系统临时目录（`mkdtemp` 的 `agent-refactor-*`），成功后清理，失败自动回滚。
 - **门禁自动判定**：fix 跑 `testCommand`，split 跑 `buildCommand` + 可选 `verifyCommand`（如 SSR 冒烟）。
 - **失败自动回滚**：门禁不过，恢复全部文件，报告原始错误。
 - **默认 dry-run**：`--yes` 显式同意才落地；没测试命令默认拒绝修复。

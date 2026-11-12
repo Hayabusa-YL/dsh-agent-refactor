@@ -1,5 +1,20 @@
 # 变更日志
 
+## [0.3.0] - 2026-11-12
+
+### 修复
+
+- **六仓库真实语料回归**（ofetch / create-vue / unplugin-auto-import / hono / pinia / express）：补上 `.mts/.cts` 全量扫描、VitePress `.vitepress` 入口、Nuxt 模块 `runtime/` 约定、`*.test-d.ts` 类型测试入口、config 模板字符串路径按通配展开、CI workflow 点名的依赖算用到、`.d.ts` 声明文件不判 high、`simple-git-hooks` 入口、benchmarks/docs 包不做依赖检查
+- 置信度兜底：`.d.ts` 声明与模板/resources 目录统一降级，fix 只删 high
+- 语料修复后：6 仓库 high 归零，剩余 medium/low 逐条人工核对为约定或遗留，不误删
+
+## [0.2.0] - 2026-11-12
+
+### 修复
+
+- 未使用依赖误报清理：templates/examples 包跳过、脚本 bin 别名映射（nr / run-p / tsgo / nuxt-module-build）、`--coverage` 与 provider 推断 coverage 包、automd 文档标记不算未用
+- 新增真实仓库回归语料（`npm run corpus`）
+
 ## [0.1.0] - 2026-11-11
 
 ### 新增
