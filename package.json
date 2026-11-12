@@ -1,6 +1,6 @@
 {
   "name": "agent-refactor",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "description": "AST-powered code health CLI: dead code, unused deps, cycles — with evidence chains",
   "type": "module",
   "bin": {
