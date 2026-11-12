@@ -125,7 +125,8 @@ async function runStaticRegression(root, componentRel, children) {
     "test('split regression: children files exist and export', async () => {",
     '  for (const child of children) {',
     "    const code = await readFile(child, 'utf8');",
-    '    assert.ok(/export\\s/.test(code), `${child} must export something`);',
+    "    const exported = /export\\s/.test(code) || /<script\\s+setup/.test(code) || /defineComponent/.test(code);",
+    '    assert.ok(exported, `${child} must export something`);',
     '  }',
     '});',
   ].join('\n');

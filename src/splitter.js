@@ -20,6 +20,45 @@ const PLAN_SYSTEM = `你是一个资深 React 架构师。任务：把一个巨�
 }
 规则：子组件必须自包含（props 齐全、不依赖父组件局部变量）；hook 名以 use 开头；迁移步骤 3-8 条；hook 文件（.ts）只放状态/副作用/计算逻辑，禁止返回或包含任何 JSX——需要渲染的逻辑必须做成组件（.tsx）。`;
 
+const VUE_ANALYZE_SYSTEM = `你是一个资深 Vue 3 架构师。阅读一个巨型单文件组件（.vue）的完整源码，输出语义地图 JSON：
+{
+  "states": [{ "name": "state 名", "type": "类型", "usedIn": "被哪些 UI 区块使用" }],
+  "effects": [{ "name": "副作用描述", "deps": ["依赖"] }],
+  "uiBlocks": [{ "name": "UI 区块名", "lineRange": "大致行范围", "purpose": "负责什么" }],
+  "events": [{ "name": "事件 handler", "source": "触发来源" }],
+  "crossCoupling": ["组件内部耦合最严重的点"]
+}
+只输出 JSON，不要解释。`;
+
+const VUE_PLAN_SYSTEM = `你是一个资深 Vue 3 架构师。任务：把一个巨型 .vue 单文件组件拆成 3-5 个子组件 + custom composables。
+只输出 JSON，不要解释。JSON 结构：
+{
+  "components": [
+    { "name": "PascalCase 组件名", "file": "相对路径.vue", "responsibility": "一句话职责",
+      "props": [{ "name": "camelCase", "type": "string", "source": "父组件哪个 ref/reactive/computed 提供" }],
+      "events": [{ "name": "emit 名如 update:count", "from": "子组件触发的事件来源" }] }
+  ],
+  "hooks": [
+    { "name": "useXxx", "file": "相对路径.js 或 .ts", "responsibility": "一句话", "state": ["state 名"] }
+  ],
+  "migration": ["按顺序的迁移步骤，每步说清改哪个文件"],
+  "risks": ["拆分风险提示"]
+}
+规则：子组件必须自包含（props/emits 齐全、不依赖父组件局部变量）；composable 名以 use 开头、禁止包含模板或 JSX；所有组件文件一律 .vue；迁移步骤 3-8 条。`;
+
+const VUE_GENERATE_SYSTEM = `你是资深 Vue 3 工程师。按拆分计划生成完整代码。只输出 JSON：
+{
+  "files": [{ "path": "components/RelativePath.vue", "content": "完整文件内容（含 <script setup> 与 <template>，必要时 <style>）" }],
+  "parent": { "path": "原组件相对路径.vue", "content": "改造后的父组件完整内容" }
+}
+规则：
+- files 必须覆盖计划里所有 components 和 hooks 的 file 字段；
+- 每个 .vue 文件内容完整可编译；composable 用 .js/.ts，禁止包含模板或 JSX；
+- 使用 <script setup> + defineProps/defineEmits 传递 props 与事件；
+- 不引入新依赖；
+- 父组件改为组合子组件和 composables，保持原 UI 与交互行为不变；
+- 如果原型是 .vue 且不需要强类型，composable 用 .js。`;
+
 const ANALYZE_SYSTEM = `你是一个资深 React 架构师。阅读一个巨型组件的完整源码，输出语义地图 JSON：
 {
   "states": [{ "name": "state 名", "type": "类型", "usedIn": "被哪些 UI 区块使用" }],
@@ -33,7 +72,7 @@ const ANALYZE_SYSTEM = `你是一个资深 React 架构师。阅读一个巨型�
 export async function analyzeComponent(llm, code, meta = {}) {
   const content = await llm.chat(
     [
-      { role: 'system', content: ANALYZE_SYSTEM },
+      { role: 'system', content: meta.kind === 'vue' ? VUE_ANALYZE_SYSTEM : ANALYZE_SYSTEM },
       { role: 'user', content: `组件路径：${meta.path || 'unknown'}\n\n完整源码：\n${code}` },
     ],
     { json: true, maxTokens: 3000 },
@@ -44,7 +83,7 @@ export async function analyzeComponent(llm, code, meta = {}) {
 export async function planSplit(llm, code, analysis, meta = {}) {
   const content = await llm.chat(
     [
-      { role: 'system', content: PLAN_SYSTEM },
+      { role: 'system', content: meta.kind === 'vue' ? VUE_PLAN_SYSTEM : PLAN_SYSTEM },
       {
         role: 'user',
         content: `组件路径：${meta.path || 'unknown'}\n\n语义地图：\n${JSON.stringify(analysis, null, 2)}\n\n完整源码：\n${code}`,
@@ -103,7 +142,7 @@ export async function generateComponents(llm, code, plan, meta = {}) {
     : '';
   const content = await llm.chat(
     [
-      { role: 'system', content: GENERATE_SYSTEM },
+      { role: 'system', content: meta.kind === 'vue' ? VUE_GENERATE_SYSTEM : GENERATE_SYSTEM },
       {
         role: 'user',
         content: `原组件路径：${meta.path || 'unknown'}\n\n拆分计划：\n${JSON.stringify(plan, null, 2)}\n\n完整源码：\n${code}${feedback}`,

@@ -5,7 +5,7 @@ import { readFile, writeFile, mkdir, cp, rm, rmdir, mkdtemp } from 'node:fs/prom
 import { join, dirname, resolve, relative } from 'node:path';
 import { tmpdir } from 'node:os';
 import { analyzeComponent, planSplit, validatePlan, generateComponents, validateGenerated } from './splitter.js';
-import { verifyBuild } from './verify.js';
+import { verifyBuild, checkSyntax } from './verify.js';
 import { captureBehaviorBaseline, verifySplitRegression } from './regression.js';
 import { runCommand } from './fix.js';
 import { scanGeneratedSafety } from './safety.js';
@@ -23,13 +23,14 @@ export async function splitComponent({ root, componentRel, llm, dryRun = false, 
   const componentPath = resolve(root, componentRel);
   const code = await readFile(componentPath, 'utf8');
   const lines = code.split('\n').length;
+  const isVue = /\.vue$/.test(componentRel);
 
   if (lines < MIN_LINES) {
     return { ok: false, stage: 'screening', message: `组件只有 ${lines} 行，未达巨组件标准（建议 ${MIN_LINES}+ 行）` };
   }
 
-  const analysis = await analyzeComponent(llm, code, { path: componentRel });
-  const plan = await planSplit(llm, code, analysis, { path: componentRel });
+  const analysis = await analyzeComponent(llm, code, { path: componentRel, kind: isVue ? 'vue' : undefined });
+  const plan = await planSplit(llm, code, analysis, { path: componentRel, kind: isVue ? 'vue' : undefined });
   const planErrors = validatePlan(plan);
   if (planErrors.length) return { ok: false, stage: 'plan', plan, analysis, errors: planErrors };
 
@@ -37,14 +38,14 @@ export async function splitComponent({ root, componentRel, llm, dryRun = false, 
 
   if (!yes) return { ok: false, stage: 'confirm', plan, analysis, lines, message: '计划已生成，加 --yes 确认生成代码' };
 
-  let generated = await generateComponents(llm, code, plan, { path: componentRel });
+  let generated = await generateComponents(llm, code, plan, { path: componentRel, kind: isVue ? 'vue' : undefined });
   const genErrors = validateGenerated(generated, plan);
   if (genErrors.length) return { ok: false, stage: 'generate', plan, errors: genErrors };
 
   // 静态安全审查：红线命中回喂一次，重生成仍命中则拒绝落盘
   let safety = scanGeneratedSafety(generated);
   if (!safety.ok) {
-    generated = await generateComponents(llm, code, plan, { path: componentRel, safetyIssues: safety.blockers });
+    generated = await generateComponents(llm, code, plan, { path: componentRel, kind: isVue ? 'vue' : undefined, safetyIssues: safety.blockers });
     const retryErrors = validateGenerated(generated, plan);
     if (retryErrors.length) {
       return { ok: false, stage: 'safety', plan, errors: [...safety.blockers.map((b) => `${b.file}: ${b.message}`), ...retryErrors] };
@@ -92,6 +93,11 @@ export async function splitComponent({ root, componentRel, llm, dryRun = false, 
       if (baseline?.path) await rm(baseline.path, { force: true }).catch(() => {});
       return failVerify('verify', { build, plan, written });
     }
+    if (build.skipped) {
+      // 无构建命令兜底：至少保证生成的 JS 文件语法可解析，其余由静态回归覆盖
+      const syntax = await checkSyntax(root, written);
+      if (!syntax.ok) return failVerify('verify-syntax', { syntax, plan, written });
+    }
 
     // 回归验证：行为快照优先，环境不支持时走静态结构回归
     const regression = await verifySplitRegression(root, { componentRel, generated, plan, baseline });
@@ -107,7 +113,7 @@ export async function splitComponent({ root, componentRel, llm, dryRun = false, 
       stage: 'done',
       plan,
       written,
-      build: { command: build.command, ms: build.ms },
+      build: { command: build.command, ms: build.ms, skipped: !!build.skipped },
       regression: { mode: regression.mode, ms: regression.ms },
       safety: { ok: safety.ok, warnings: safety.warnings },
       smoke: smoke ? { command: smoke.command, ms: smoke.ms } : null,

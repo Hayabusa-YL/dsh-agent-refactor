@@ -146,3 +146,6 @@ npm run gate
 - [x] 真实仓库端到端构建验证（ant-design-pro advanced-form，构建 + 类型检查通过）
 - [x] GitHub Action：PR / push 自动体检评论（.github/workflows/self-scan.yml）
 - [x] 真实仓库回归语料（create-vue / ofetch / unplugin-auto-import，`npm run corpus` 复现）
+- [x] Vue SFC 拆分支持（analyze/plan/generate 按 .vue 走 Vue 专用路线）
+- [x] 无构建脚本兜底（node --check 语法检查 + 静态结构回归）
+- [x] gate 挂进 CI（self-scan workflow 增加 gate job）

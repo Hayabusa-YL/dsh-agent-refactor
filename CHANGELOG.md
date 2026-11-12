@@ -1,5 +1,13 @@
 # 变更日志
 
+## [0.5.0] - 2026-11-12
+
+### 新增
+
+- Vue SFC 拆分支持：`analyze`/`plan`/`generate` 对 `.vue` 文件走 Vue 专用 prompt，产出子组件与 composables；静态行为回归兼容 `<script setup>`，无 vitest 环境也能校验
+- 无构建脚本兜底：项目没有 build 命令时 split 不再直接失败，退回 `node --check` 语法检查 + 静态结构回归
+- `gate` 挂进 CI：`self-scan` workflow 增加 gate job，推送即跑全量门禁
+
 ## [0.4.0] - 2026-11-12
 
 ### 新增

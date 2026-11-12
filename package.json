@@ -1,6 +1,6 @@
 {
   "name": "agent-refactor",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "AST-powered code health CLI: dead code, unused deps, cycles — with evidence chains",
   "type": "module",
   "bin": {
@@ -8,7 +8,7 @@
   },
   "main": "src/cli.js",
   "scripts": {
-    "test": "node --test test/scan.test.js test/fix.test.js test/splitter.test.js test/split-flow.test.js test/frameworks.test.js test/regression.test.js test/split-behavior.test.js test/safety.test.js test/batch.test.js",
+    "test": "node --test test/scan.test.js test/fix.test.js test/splitter.test.js test/split-flow.test.js test/frameworks.test.js test/regression.test.js test/split-behavior.test.js test/safety.test.js test/batch.test.js test/split-flow-vue.test.js",
     "corpus": "node scripts/validate-corpus.mjs",
     "gate": "node scripts/gate.mjs"
   },
