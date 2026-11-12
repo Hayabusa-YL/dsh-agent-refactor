@@ -80,6 +80,8 @@
 
 **成本**：单组件完整拆分（分析 + 规划 + 生成，共 3 次 LLM 调用）约 2–3 万 token，按 DeepSeek 价格约 **3–5 分钱**；失败回喂修复每轮再加约 3 千 token。样本与记录见 `memory/audit/split-engine-2026-11-15.md`。
 
+**量化与公开评测**：本地基准 `node scripts/bench.mjs`（real-repo 391 文件 / 417ms / 死代码 14 / 未用依赖 2），历史 SWE-bench 47/47 补丁验证与 τ-bench retail 71.3% 等数据（含污染与口径限制）见 [benchmark/](benchmark/)。测试覆盖率 `npm run coverage`：行 94.25% / 分支 81.93% / 函数 87.81%。
+
 ## 诚实边界（先看这里）
 
 1. **行为等价性机器证明不到 100%。** 门禁能证明"能编译、结构等价、现有测试通过"，但异步、动画、副作用类组件的真实行为必须人工回归——这是物理上限，不是没做。
@@ -162,3 +164,5 @@ npm run gate
 - [x] gate 挂进 CI（self-scan workflow 增加 gate job）
 - [x] 公开量化 benchmark（scripts/bench.mjs：耗时 / 文件数 / 死代码 / 未用依赖 / 循环依赖）
 - [x] VSCode 插件最小版（命令面板一键体检，诊断标在编辑器）
+- [x] 公开评测历史归档（benchmark/：SWE-bench 补丁验证 + τ-bench，含口径限制）
+- [x] 覆盖率量化（npm run coverage：行 94.25% / 分支 81.93%）
